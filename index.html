@@ -478,7 +478,6 @@ body {
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 설정
@@ -490,11 +489,36 @@ const LS_KEY_KEY = 'nospo_sb_key';
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 상태
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let supabase = null;
+// Supabase 설정 (SDK 없이 fetch 직접 사용)
+let SB_URL = '';
+let SB_KEY = '';
 let isAdmin  = false;
 let currentSport = 'soccer';
 let matches  = [];
 let logoClicks = 0, logoTimer = null;
+let pollTimer = null;
+
+function sbHeaders() {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+}
+
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SB_URL + '/rest/v1/' + path, {
+    ...options,
+    headers: { ...sbHeaders(), ...(options.headers || {}) }
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 유틸
@@ -520,41 +544,35 @@ function fmtDate(d) {
   return `${dt.getMonth()+1}/${dt.getDate()}(${days[dt.getDay()]})`;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Supabase SDK (body 하단에 로드됨)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function loadSupabaseSDK() {
-  return Promise.resolve(typeof window.supabase !== 'undefined');
-}
-
-function initSupabase() {
-  return false;
+function initDB() {
+  SB_URL = localStorage.getItem(LS_URL_KEY) || '';
+  SB_KEY = localStorage.getItem(LS_KEY_KEY) || '';
 }
 
 async function loadMatches() {
-  if (!supabase) {
+  if (!SB_URL || !SB_KEY) {
     matches = getSeedMatches();
     renderMatches();
     return;
   }
   renderLoading();
-  const { data, error } = await supabase
-    .from('matches')
-    .select('*')
-    .order('created_at', { ascending: false });
-  if (error) {
+  try {
+    const data = await sbFetch('matches?select=*&order=created_at.desc');
+    matches = data || [];
+    renderMatches();
+    // 10초마다 폴링
+    clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      try {
+        const d = await sbFetch('matches?select=*&order=created_at.desc');
+        matches = d || [];
+        renderMatches();
+      } catch(e) {}
+    }, 10000);
+  } catch(e) {
     matches = getSeedMatches();
     renderMatches();
-    return;
   }
-  matches = data || [];
-  renderMatches();
-
-  // 실시간 구독
-  supabase
-    .channel('matches-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, () => loadMatches())
-    .subscribe();
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -630,8 +648,8 @@ function cardHtml(m) {
   if (m.highlight && ytId(m.highlight)) {
     actions += `<button class="act act-hl act-hl-btn" data-url="${escHtml(m.highlight)}">🎬 하이라이트</button>`;
   }
-  if (m.full && ytId(m.full)) {
-    actions += `<button class="act act-full act-full-btn" data-url="${escHtml(m.full)}">📺 풀영상</button>`;
+  if ((m.fullvideo || m.full) && ytId(m.fullvideo || m.full)) {
+    actions += `<button class="act act-full act-full-btn" data-url="${escHtml(m.fullvideo || m.full)}">📺 풀영상</button>`;
   }
   if (m.live) {
     actions += `<a class="act act-live" href="${escHtml(m.live)}" target="_blank" rel="noopener">📡 중계</a>`;
@@ -707,11 +725,13 @@ $('apAdd').addEventListener('click', async () => {
 
   if (!teams || !date) { alert('팀명과 날짜를 입력하세요.'); return; }
 
-  const row = { sport, league, teams, date, status, score, highlight, full, live };
+  const row = { sport, league, teams, date, status, score, highlight, fullvideo: full, live };
 
-  if (supabase) {
-    const { error } = await supabase.from('matches').insert([row]);
-    if (error) { alert('저장 실패: ' + error.message); return; }
+  if (SB_URL && SB_KEY) {
+    try {
+      await sbFetch('matches', { method: 'POST', body: JSON.stringify(row) });
+      await loadMatches();
+    } catch(e) { alert('저장 실패: ' + e.message); return; }
   } else {
     matches.unshift({ ...row, id: 'local_' + Date.now() });
     renderMatches();
@@ -720,13 +740,16 @@ $('apAdd').addEventListener('click', async () => {
   ['aeTeams','aeScore','aeHighlight','aeFull','aeLive','aeLeague'].forEach(k => { $(k).value = ''; });
   currentSport = sport;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.sport === sport));
-  if (!supabase) renderMatches();
+  renderMatches();
 });
 
 async function deleteMatch(id) {
   if (!confirm('삭제할까요?')) return;
-  if (supabase && !id.startsWith('local_')) {
-    await supabase.from('matches').delete().eq('id', id);
+  if (SB_URL && SB_KEY && !id.startsWith('local_')) {
+    try {
+      await sbFetch('matches?id=eq.' + id, { method: 'DELETE' });
+      await loadMatches();
+    } catch(e) { alert('삭제 실패: ' + e.message); }
   } else {
     matches = matches.filter(m => (m.id || m.match_id) !== id);
     renderMatches();
@@ -810,14 +833,16 @@ $('cfgSave').addEventListener('click', async () => {
 
   $('cfgSave').textContent = '연결 중…';
   try {
-    const loaded = await loadSupabaseSDK();
-    if (!loaded) throw new Error('Supabase SDK 로드 실패');
-    const sb = window.supabase.createClient(url, key);
-    const { error } = await sb.from('matches').select('id').limit(1);
-    if (error) throw error;
-    localStorage.setItem(LS_URL_KEY, url);
+    // 연결 테스트
+    const testUrl = url.replace(/\/$/, '');
+    const res = await fetch(testUrl + '/rest/v1/matches?select=id&limit=1', {
+      headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
+    });
+    if (!res.ok) throw new Error('응답 오류: ' + res.status);
+    localStorage.setItem(LS_URL_KEY, testUrl);
     localStorage.setItem(LS_KEY_KEY, key);
-    supabase = sb;
+    SB_URL = testUrl;
+    SB_KEY = key;
     $('cfgStatus').textContent = '✅ 연결 성공! 경기 데이터를 불러옵니다.';
     $('cfgStatus').className = 'cfg-status ok';
     setTimeout(() => {
@@ -848,7 +873,7 @@ function getSeedMatches() {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 초기화
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-initSupabase();
+initDB();
 loadMatches();
 </script>
 </body>
