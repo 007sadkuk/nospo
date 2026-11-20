@@ -372,7 +372,7 @@ body {
   </div>
   <div class="header-right">
     <span class="admin-pill" id="adminPill">관리자</span>
-    <button class="cfg-btn" id="cfgBtn">⚙ DB 설정</button>
+    <button class="cfg-btn" id="cfgBtn" style="display:none">⚙ DB 설정</button>
   </div>
 </header>
 
@@ -490,8 +490,8 @@ const LS_KEY_KEY = 'nospo_sb_key';
 // 상태
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Supabase 설정 (SDK 없이 fetch 직접 사용)
-let SB_URL = '';
-let SB_KEY = '';
+let SB_URL = 'https://bmkkqzcrfcksfujrqsaa.supabase.co';
+let SB_KEY = 'sb_publishable_yD2rwr8W3v6WiWaH6gstew_jNt8fg2H';
 let isAdmin  = false;
 let currentSport = 'soccer';
 let matches  = [];
@@ -550,28 +550,15 @@ function initDB() {
 }
 
 async function loadMatches() {
-  if (!SB_URL || !SB_KEY) {
-    matches = getSeedMatches();
-    renderMatches();
-    return;
-  }
   renderLoading();
   try {
-    const data = await sbFetch('matches?select=*&order=created_at.desc');
-    matches = data || [];
+    const res = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const d = await res.json();
+    matches = d.matches || [];
     renderMatches();
-    // 10초마다 폴링
-    clearInterval(pollTimer);
-    pollTimer = setInterval(async () => {
-      try {
-        const d = await sbFetch('matches?select=*&order=created_at.desc');
-        matches = d || [];
-        renderMatches();
-      } catch(e) {}
-    }, 10000);
-  } catch(e) {
-    matches = getSeedMatches();
-    renderMatches();
+  } catch (e) {
+    $('matchArea').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>경기 데이터를 불러오지 못했어요. 잠시 후 새로고침해 주세요.</div>`;
   }
 }
 
@@ -638,6 +625,8 @@ function cardHtml(m) {
         <button class="score-btn" data-id="${id}">🔒 스코어 보기 (스포일러 주의)</button>
         <div class="score-reveal" id="sc-${id}">${escHtml(m.score)}</div>
       </div>`;
+  } else if (m.status === 'end') {
+    scoreHtml = '';
   } else if (m.status === 'live') {
     scoreHtml = `<div style="font-size:12px;color:var(--accent3);padding:10px 0 6px">🔴 현재 진행 중</div>`;
   } else {
@@ -859,22 +848,11 @@ $('cfgSave').addEventListener('click', async () => {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 시드 (Supabase 없을 때)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getSeedMatches() {
-  return [
-    { id:'s1', sport:'soccer', league:'챔피언스리그', teams:'레알 마드리드 vs 도르트문트', date:'2025-06-01', status:'end', score:'2-0', highlight:'', full:'', live:'' },
-    { id:'s2', sport:'soccer', league:'EPL', teams:'아스날 vs 맨시티', date:'2025-11-02', status:'end', score:'1-0', highlight:'', full:'', live:'' },
-    { id:'s3', sport:'soccer', league:'EPL', teams:'리버풀 vs 맨유', date:'2025-11-23', status:'soon', score:'', highlight:'', full:'', live:'' },
-    { id:'b1', sport:'baseball', league:'KBO 한국시리즈', teams:'LG 트윈스 vs KIA 타이거즈', date:'2025-10-19', status:'end', score:'4-2', highlight:'', full:'', live:'https://sports.daum.net' },
-    { id:'l1', sport:'lck', league:'LCK', teams:'T1 vs 젠지', date:'2025-09-14', status:'end', score:'2-0', highlight:'', full:'', live:'https://youtube.com/@lck' },
-    { id:'u1', sport:'ufc', league:'UFC 311', teams:'존 존스 vs 스티페 미오치치', date:'2025-11-15', status:'soon', score:'', highlight:'', full:'', live:'https://ufc.com' },
-  ];
-}
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 초기화
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-initDB();
 loadMatches();
+setInterval(loadMatches, 5 * 60 * 1000);
 </script>
 </body>
 </html>

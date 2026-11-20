@@ -1,0 +1,7 @@
+[
+  { "sport": "soccer",   "league": "해외축구", "handle": "@SPOTV",        "must": ["하이라이트"] },
+  { "sport": "soccer",   "league": "해외축구", "handle": "@coupangplay",  "must": ["하이라이트"] },
+  { "sport": "baseball", "league": "KBO",      "handle": "@tvingsports",  "must": ["하이라이트"] },
+  { "sport": "lck",      "league": "LCK",      "handle": "@LCK",          "must": ["하이라이트", "HIGHLIGHT", "Highlight", "H/L"] },
+  { "sport": "ufc",      "league": "UFC",      "handle": "@UFCKorea",     "must": ["하이라이트"] }
+]
