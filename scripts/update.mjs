@@ -32,6 +32,9 @@ function parseTeams(title) {
     .replace(/\d+\s*[-:]\s*\d+/g, ' ')
     .replace(/하이라이트|HIGHLIGHTS?|Highlights?|H\/L|풀영상|FULL/gi, ' ')
     .replace(/[^\p{L}\p{N}\s.&']/gu, ' ')
+    .replace(/ㅣ.*$/, ' ')
+    .replace(/\d+\s*분/g, ' ')
+    .replace(/(^|\s)(매치|경기|주요장면)(?=\s|$)/g, ' ')
     .replace(/\s+/g, ' ').trim();
   const A = clean(a).split(' ').slice(-4).join(' ');
   const B = clean(b).split(' ').slice(0, 4).join(' ');
@@ -40,7 +43,10 @@ function parseTeams(title) {
 }
 
 const channels = readJson('channels.json', []);
-const prev = readJson('data.json', { matches: [] }).matches.filter(m => !m.manual);
+// 다른 종목(농구·배구 등)이 섞이지 않게 거르는 단어
+const EXCLUDE = /농구|KBL|WKBL|배구|V-?리그|은행|생명|BNK|KB스타즈|핸드볼/i;
+const old = readJson('data.json', { matches: [] });
+const prev = old.v === 2 ? old.matches.filter(m => !m.manual) : [];
 const byId = new Map(prev.map(m => [m.id, m]));
 let ok = 0;
 
@@ -55,8 +61,14 @@ for (const ch of channels) {
       const title = decode((e.match(/<title>([^<]*)/) || [])[1] || '');
       const pub = (e.match(/<published>([^<]+)/) || [])[1] || '';
       if (!vid || (ch.must && !ch.must.some(k => title.includes(k)))) continue;
+      if (EXCLUDE.test(title)) continue;
+      if (ch.months && !ch.months.includes(Number(pub.slice(5, 7)))) continue;
       const teams = parseTeams(title);
       if (!teams) continue;
+      if (ch.teams) {
+        const [a, b] = teams.split(' vs ');
+        if (!ch.teams.some(t => a.includes(t)) || !ch.teams.some(t => b.includes(t))) continue;
+      }
       byId.set(vid, {
         id: vid, sport: ch.sport, league: ch.league, teams,
         date: pub.slice(0, 10), status: 'end',
@@ -75,5 +87,5 @@ const manual = readJson('manual.json', []).map((m, i) => ({ id: 'manual_' + i, s
 const matches = [...manual, ...[...byId.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 300)];
 
 if (!ok && !manual.length) { console.log('모든 채널 실패 — data.json 유지'); process.exit(0); }
-writeFileSync('data.json', JSON.stringify({ updated: new Date().toISOString(), matches }, null, 1));
+writeFileSync('data.json', JSON.stringify({ v: 2, updated: new Date().toISOString(), matches }, null, 1));
 console.log(`총 ${matches.length}경기 저장`);

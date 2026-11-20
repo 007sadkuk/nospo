@@ -1,7 +1,67 @@
 [
-  { "sport": "soccer",   "league": "해외축구", "handle": "@SPOTV",        "must": ["하이라이트"] },
-  { "sport": "soccer",   "league": "해외축구", "handle": "@coupangplay",  "must": ["하이라이트"] },
-  { "sport": "baseball", "league": "KBO",      "handle": "@tvingsports",  "must": ["하이라이트"] },
-  { "sport": "lck",      "league": "LCK",      "handle": "@LCK",          "must": ["하이라이트", "HIGHLIGHT", "Highlight", "H/L"] },
-  { "sport": "ufc",      "league": "UFC",      "handle": "@UFCKorea",     "must": ["하이라이트"] }
+ {
+  "sport": "soccer",
+  "league": "해외축구",
+  "handle": "@SPOTV",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "해외축구",
+  "handle": "@coupangplay",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "baseball",
+  "league": "KBO",
+  "handle": "@tvingsports",
+  "must": [
+   "하이라이트"
+  ],
+  "teams": [
+   "LG",
+   "KT",
+   "SSG",
+   "NC",
+   "두산",
+   "KIA",
+   "롯데",
+   "삼성",
+   "한화",
+   "키움"
+  ],
+  "months": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ]
+ },
+ {
+  "sport": "lck",
+  "league": "LCK",
+  "handle": "@LCK",
+  "must": [
+   "하이라이트",
+   "HIGHLIGHT",
+   "Highlight",
+   "H/L"
+  ]
+ },
+ {
+  "sport": "ufc",
+  "league": "UFC",
+  "handle": "@UFCKorea",
+  "must": [
+   "하이라이트"
+  ]
+ }
 ]
