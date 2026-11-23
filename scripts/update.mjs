@@ -33,6 +33,8 @@ function parseTeams(title) {
     .replace(/하이라이트|HIGHLIGHTS?|Highlights?|H\/L|풀영상|FULL/gi, ' ')
     .replace(/[^\p{L}\p{N}\s.&']/gu, ' ')
     .replace(/ㅣ.*$/, ' ')
+    .replace(/(^|\s)\d+R(?=\s|$)/g, ' ')
+    .replace(/(^|\s)\d+라운드(?=\s|$)/g, ' ')
     .replace(/\d+\s*분/g, ' ')
     .replace(/(^|\s)(매치|경기|주요장면)(?=\s|$)/g, ' ')
     .replace(/\s+/g, ' ').trim();
@@ -44,9 +46,9 @@ function parseTeams(title) {
 
 const channels = readJson('channels.json', []);
 // 다른 종목(농구·배구 등)이 섞이지 않게 거르는 단어
-const EXCLUDE = /농구|KBL|WKBL|배구|V-?리그|은행|생명|BNK|KB스타즈|핸드볼/i;
+const EXCLUDE = /배드민턴|&|야구|APBC|WBC|모음|TOP ?\d|농구|KBL|WKBL|배구|V-?리그|은행|생명|BNK|KB스타즈|핸드볼/i;
 const old = readJson('data.json', { matches: [] });
-const prev = old.v === 2 ? old.matches.filter(m => !m.manual) : [];
+const prev = old.v === 3 ? old.matches.filter(m => !m.manual) : [];
 const byId = new Map(prev.map(m => [m.id, m]));
 let ok = 0;
 
@@ -87,5 +89,5 @@ const manual = readJson('manual.json', []).map((m, i) => ({ id: 'manual_' + i, s
 const matches = [...manual, ...[...byId.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 300)];
 
 if (!ok && !manual.length) { console.log('모든 채널 실패 — data.json 유지'); process.exit(0); }
-writeFileSync('data.json', JSON.stringify({ v: 2, updated: new Date().toISOString(), matches }, null, 1));
+writeFileSync('data.json', JSON.stringify({ v: 3, updated: new Date().toISOString(), matches }, null, 1));
 console.log(`총 ${matches.length}경기 저장`);
