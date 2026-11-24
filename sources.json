@@ -1,0 +1,147 @@
+[
+ {
+  "sport": "soccer",
+  "league": "챔피언스리그",
+  "playlist": "PLFv9FSP5yZD4",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "유로파리그",
+  "playlist": "PLO9Ar5MUJ3Q0",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "컨퍼런스리그",
+  "playlist": "PLRiAV5s18pNw",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "세리에A",
+  "playlist": "PLby5iI7KwVMA",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "스코틀랜드 리그",
+  "playlist": "PLYd3VG76fMo4",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "네이션스리그",
+  "playlist": "PLZ3R6Pmx3kmc",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "handle": "@SPOTV",
+  "must": [
+   "SPOTV FOOTBALL"
+  ],
+  "leagueFromBracket": true
+ },
+ {
+  "sport": "soccer",
+  "handle": "@CoupangPlaySports",
+  "must": [
+   "하이라이트"
+  ],
+  "leagueFromBracket": true,
+  "bracketAllow": [
+   "프리미어리그",
+   "라리가",
+   "분데스리가",
+   "K리그1",
+   "K리그2",
+   "MLS",
+   "코리아컵",
+   "FA컵",
+   "카라바오컵",
+   "리그앙",
+   "에레디비시"
+  ]
+ },
+ {
+  "sport": "baseball",
+  "league": "KBO",
+  "playlist": "PLQSdHthiYH--pEoRrL9NEQqwzFQTz1TSw",
+  "must": [
+   "KBO"
+  ]
+ },
+ {
+  "sport": "baseball",
+  "league": "KBO 포스트시즌",
+  "playlist": "PLUYV_Y0WdgNw",
+  "must": [
+   "KBO"
+  ]
+ },
+ {
+  "sport": "baseball",
+  "league": "KBO 한국시리즈",
+  "playlist": "PLKqFDl93fVoo",
+  "must": [
+   "KBO"
+  ]
+ },
+ {
+  "sport": "baseball",
+  "league": "KBO",
+  "handle": "@tvingsports",
+  "must": [
+   "KBO"
+  ]
+ },
+ {
+  "sport": "lck",
+  "league": "LCK",
+  "playlist": "PLIWtfvmBcNocpzEpM2WLn-Unptgj4qTD3"
+ },
+ {
+  "sport": "lck",
+  "league": "LCK",
+  "playlist": "PLIWtfvmBcNodvyD3taAVg_igHsOilJHU1"
+ },
+ {
+  "sport": "lck",
+  "league": "월드 챔피언십",
+  "playlist": "PLVXAxS77cLF0"
+ },
+ {
+  "sport": "lck",
+  "league": "월드 챔피언십",
+  "playlist": "PLMRN2qlX_Lzg"
+ },
+ {
+  "sport": "lck",
+  "league": "LCK",
+  "handle": "@LCK",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "ufc",
+  "league": "UFC",
+  "handle": "@tvNSPORTS",
+  "must": [
+   "[UFC"
+  ]
+ }
+]

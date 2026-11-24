@@ -2,857 +2,396 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>노스포 — 스포일러 없는 스포츠</title>
-
-<!-- Google Fonts -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>노스포</title>
+<meta name="description" content="결과는 숨기고 하이라이트만. 해외축구·KBO·LCK·UFC 스포일러 없는 하이라이트.">
+<meta name="theme-color" content="#0B0D12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&family=Inter:wght@500;700;800;900&display=swap">
-
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Black+Han+Sans&family=Gothic+A1:wght@500;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* ━━━━━━━━━━━━━━━━━━━━ 토큰 ━━━━━━━━━━━━━━━━━━━━ */
+/* 경기장 야간 조명 아래 전광판 — 한 가지 세계로 고정한 다크 디자인 */
 :root {
-  --bg:       #07070E;
-  --bg2:      #0C0C1A;
-  --surf:     #111126;
-  --card:     #14142A;
-  --card2:    #18183A;
-  --border:   rgba(255,255,255,.07);
-  --border2:  rgba(255,255,255,.12);
-  --accent:   #7C6FFF;
-  --accent2:  #3ECFAD;
-  --accent3:  #FF4E6B;
-  --gold:     #F5A623;
-  --fg:       #EEEEF8;
-  --fg2:      #9494B8;
-  --fg3:      #4A4A70;
-  --radius:   14px;
+  --ground: #0B0D12; --surface: #151922; --raised: #1E2330; --line: #262C3A;
+  --text: #F3F5F8; --muted: #8D96A8; --faint: #566075;
+  --accent: #FFB21A; --accent-ink: #14110A;
+  --soccer: #33C17D; --baseball: #FF6A3D; --lck: #6C8CFF; --ufc: #FF3D57;
+  --font: 'Gothic A1', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --display: 'Black Han Sans', 'Gothic A1', sans-serif;
+  --cond: 'Barlow Condensed', 'Gothic A1', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: 'Noto Sans KR', system-ui, sans-serif;
-  min-height: 100dvh;
-  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-  overflow-x: hidden;
-}
+html { -webkit-text-size-adjust: 100%; background: var(--ground); }
+body { background: var(--ground); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.45; min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 640px; margin: 0 auto; padding-inline: 16px; }
 
-/* ━━━━━━━━━━━━━━━━━━━━ 헤더 ━━━━━━━━━━━━━━━━━━━━ */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: rgba(7,7,14,.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  padding: 11px 16px 11px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-}
-.logo-icon {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, #7C6FFF 0%, #3ECFAD 100%);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-.logo-text { line-height: 1.1; }
-.logo-name {
-  font-family: 'Inter', sans-serif;
-  font-size: 17px; font-weight: 900;
-  letter-spacing: -.5px;
-  background: linear-gradient(90deg, #fff 0%, #9B92FF 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.logo-sub { font-size: 10px; color: var(--fg3); }
-.header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
-.admin-pill {
-  background: var(--accent);
-  color: #fff;
-  font-size: 10px; font-weight: 700;
-  padding: 3px 9px; border-radius: 20px;
-  display: none;
-}
-.admin-pill.on { display: block; }
+/* 헤더 */
+.top { position: sticky; top: 0; z-index: 20; background: var(--ground); padding-top: env(safe-area-inset-top, 0px); }
+.top.scrolled { border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 8px; padding-block: 16px 14px; }
+.wordmark { font-family: var(--display); font-size: 28px; line-height: 1; display: flex; align-items: center; gap: 2px; }
+.wordmark .seal { background: var(--accent); color: var(--accent-ink); border-radius: 6px; padding: 4px 6px 1px; }
+.updated { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.updated::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--soccer); }
+.updated:empty { display: none; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tab { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 4px; border-radius: 12px; background: var(--surface); border: 1.5px solid transparent; font-weight: 700; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.tab .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+.tab .n { font-family: var(--cond); font-weight: 600; font-size: 13px; color: var(--faint); }
+.tab[aria-selected="true"] { color: var(--text); border-color: var(--c); background: color-mix(in srgb, var(--c) 16%, var(--ground)); }
+.tab[aria-selected="true"] .n { color: var(--text); }
+.leagues { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-block: 14px 12px; }
+.leagues::-webkit-scrollbar { display: none; }
+.leagues[hidden] { display: none; }
+.chip { flex-shrink: 0; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; font-weight: 500; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--text); color: var(--ground); border-color: var(--text); }
 
-/* ━━━━━━━━━━━━━━━━━━━━ 탭바 ━━━━━━━━━━━━━━━━━━━━ */
-.tabs {
-  display: flex;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  position: sticky;
-  top: 59px;
-  z-index: 39;
-}
-.tabs::-webkit-scrollbar { display: none; }
-.tab {
-  flex-shrink: 0;
-  padding: 13px 20px;
-  font-size: 13px; font-weight: 700;
-  color: var(--fg3);
-  cursor: pointer;
-  border-bottom: 2.5px solid transparent;
-  transition: color .15s, border-color .15s;
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-}
-.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.tab:hover:not(.active) { color: var(--fg2); }
+/* 본문 */
+main { display: flex; flex-direction: column; gap: 24px; padding-block: 10px 48px; }
+.eyebrow { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
+.feature { border-radius: 18px; padding: 18px; border: 1px solid var(--line); background: linear-gradient(135deg, color-mix(in srgb, var(--c) 22%, var(--surface)) 0%, var(--surface) 70%); display: flex; flex-direction: column; gap: 18px; }
+.meta { font-family: var(--cond); font-weight: 600; font-size: 13px; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+.versus { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.side { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; min-width: 0; }
+.side .name { font-weight: 800; font-size: 18px; line-height: 1.25; text-wrap: balance; overflow-wrap: anywhere; }
+.mono { display: grid; place-items: center; flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--raised); border: 1.5px solid var(--c); font-weight: 800; font-size: 12px; }
+.mono.big { width: 56px; height: 56px; border-width: 2px; font-size: 22px; }
+.sealed { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.scorebox { display: flex; align-items: center; gap: 10px; padding: 6px 14px; border-radius: 10px; border: 1px solid var(--line); background: color-mix(in srgb, var(--ground) 60%, transparent); font-family: var(--cond); font-weight: 700; font-size: 30px; line-height: 1; color: var(--faint); }
+.scorebox i { font-style: normal; font-size: 24px; }
+.sealed small { font-size: 11px; color: var(--muted); font-weight: 500; }
+.actions { display: flex; gap: 8px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 14px; border-radius: 12px; font-weight: 800; font-size: 15px; background: var(--raised); color: var(--text); white-space: nowrap; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); flex: 1; }
+.btn svg { width: 15px; height: 15px; }
 
-/* ━━━━━━━━━━━━━━━━━━━━ 메인 ━━━━━━━━━━━━━━━━━━━━ */
-.page { max-width: 760px; margin: 0 auto; padding: 14px 14px 0; }
+.day-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.day-head b { font-family: var(--display); font-weight: 400; font-size: 18px; }
+.day-head span { font-family: var(--cond); font-weight: 600; font-size: 13px; letter-spacing: .06em; color: var(--faint); }
+.list { display: flex; flex-direction: column; gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding: 14px 14px 14px 16px; background: var(--surface); }
+.row.watched { opacity: .55; }
+.row .teams { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.row .team { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; min-width: 0; }
+.row .team span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lock { display: inline-flex; align-items: center; gap: 4px; padding: 5px 8px; border-radius: 6px; background: var(--raised); font-family: var(--cond); font-weight: 700; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.lock svg { width: 12px; height: 12px; }
+.play { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; flex-shrink: 0; }
+.play svg { width: 16px; height: 16px; margin-left: 2px; }
+.row .more { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini { padding: 4px 9px; border-radius: 7px; background: var(--raised); font-size: 12px; font-weight: 700; color: var(--text); }
+.seen { font-family: var(--cond); font-weight: 600; font-size: 11px; color: var(--accent); letter-spacing: .06em; }
 
-/* 관리자 추가 패널 */
-.admin-panel {
-  background: var(--surf);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 14px;
-  display: none;
-}
-.admin-panel.on { display: block; }
-.ap-title { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
-.ap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.ap-grid.full { grid-template-columns: 1fr; }
-.f {
-  width: 100%; padding: 9px 11px;
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 9px;
-  color: var(--fg);
-  font-size: 13px;
-  font-family: 'Noto Sans KR', sans-serif;
-  outline: none;
-}
-.f:focus { border-color: var(--accent); }
-.f option { background: var(--surf); }
-.ap-btns { display: flex; gap: 8px; margin-top: 4px; }
-.ap-cancel { flex: 1; padding: 10px; background: var(--border); border: none; border-radius: 9px; color: var(--fg2); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-.ap-add    { flex: 2; padding: 10px; background: var(--accent); border: none; border-radius: 9px; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.state { text-align: center; padding: 64px 16px; color: var(--muted); }
+.state b { display: block; color: var(--text); font-size: 16px; margin-bottom: 6px; }
+.state button { margin-top: 16px; padding: 10px 16px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 800; }
+.skel { height: 92px; background: var(--surface); }
+.skel::after { content: ''; display: block; margin: 20px 16px; height: 12px; width: 50%; border-radius: 6px; background: var(--raised); box-shadow: 0 22px 0 0 var(--raised); }
+@media (prefers-reduced-motion: no-preference) { .skel::after { animation: pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { opacity: .45; } } }
+.foot { text-align: center; color: var(--faint); font-size: 12px; }
 
-/* 로딩 */
-.loading { text-align: center; padding: 60px 0; color: var(--fg3); }
-.spinner {
-  width: 26px; height: 26px; border-radius: 50%;
-  border: 2px solid var(--border2);
-  border-top-color: var(--accent);
-  animation: spin .7s linear infinite;
-  margin: 0 auto 10px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* 빈 상태 */
-.empty { text-align: center; padding: 60px 20px; color: var(--fg3); font-size: 14px; }
-.empty-icon { font-size: 36px; margin-bottom: 10px; }
-
-/* ━━━━━━━━━━━━━━━━━━━━ 경기 카드 ━━━━━━━━━━━━━━━━━━━━ */
-.match-list { display: flex; flex-direction: column; gap: 8px; }
-
-.match-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  transition: border-color .15s;
-}
-.match-card:hover { border-color: var(--border2); }
-
-/* 카드 헤더 */
-.mc-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 14px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.status-pill {
-  font-size: 10px; font-weight: 700;
-  padding: 3px 8px; border-radius: 6px;
-  white-space: nowrap; flex-shrink: 0;
-}
-.p-live { background: var(--accent3); color: #fff; }
-.p-end  { background: rgba(255,255,255,.07); color: var(--fg3); }
-.p-soon { background: rgba(62,207,173,.12); color: var(--accent2); }
-.mc-info { flex: 1; min-width: 0; }
-.mc-league { font-size: 10px; color: var(--fg3); margin-bottom: 2px; }
-.mc-teams  { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mc-date   { font-size: 11px; color: var(--fg3); flex-shrink: 0; }
-.mc-chevron { color: var(--fg3); font-size: 11px; transition: transform .2s; flex-shrink: 0; }
-.match-card.open .mc-chevron { transform: rotate(180deg); }
-
-/* 카드 바디 */
-.mc-body {
-  display: none;
-  padding: 2px 14px 14px;
-  border-top: 1px solid var(--border);
-}
-.match-card.open .mc-body { display: block; }
-
-/* 스코어 */
-.score-wrap { margin: 10px 0 10px; }
-.score-btn {
-  width: 100%; padding: 10px;
-  background: rgba(124,111,255,.07);
-  border: 1px dashed rgba(124,111,255,.28);
-  border-radius: 10px;
-  color: var(--fg2);
-  font-size: 12px; font-weight: 700; font-family: inherit;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-  transition: all .15s;
-}
-.score-btn:hover { background: rgba(124,111,255,.13); border-color: var(--accent); }
-.score-reveal {
-  display: none;
-  background: var(--surf); border: 1px solid var(--border2);
-  border-radius: 10px; padding: 12px 16px;
-  text-align: center;
-  font-family: 'Inter', sans-serif;
-  font-size: 24px; font-weight: 900;
-  letter-spacing: 3px;
-  color: var(--fg);
-  font-variant-numeric: tabular-nums;
-}
-.score-reveal.on { display: block; }
-
-/* 액션 버튼 */
-.mc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.act {
-  flex: 1; min-width: 110px;
-  padding: 10px 8px;
-  border-radius: 10px; border: 1px solid;
-  font-size: 12px; font-weight: 700; font-family: inherit;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
-  transition: all .15s;
-  -webkit-tap-highlight-color: transparent;
-  text-decoration: none;
-}
-.act-hl   { background: rgba(124,111,255,.09); color: var(--accent); border-color: rgba(124,111,255,.22); }
-.act-full { background: rgba(255,78,107,.07);  color: #FF7084; border-color: rgba(255,78,107,.22); }
-.act-live { background: rgba(62,207,173,.07);  color: var(--accent2); border-color: rgba(62,207,173,.22); }
-.act-del  { background: transparent; color: var(--fg3); border-color: var(--border); font-size: 11px; }
-.act:hover { filter: brightness(1.15); }
-.act:active { transform: scale(.97); }
-.no-link  { font-size: 11px; color: var(--fg3); align-self: center; }
-
-/* 삭제 행 */
-.del-row { margin-top: 10px; }
-
-/* ━━━━━━━━━━━━━━━━━━━━ 영상 모달 ━━━━━━━━━━━━━━━━━━━━ */
-.player-modal {
-  display: none;
-  position: fixed; inset: 0;
-  z-index: 90;
-  background: rgba(0,0,0,.92);
-  align-items: center; justify-content: center;
-  flex-direction: column;
-  padding: 16px;
-}
-.player-modal.on { display: flex; }
-.player-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 820px;
-  aspect-ratio: 16/9;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 20px 80px rgba(0,0,0,.8);
-}
-.player-wrap iframe {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  border: none;
-}
-.player-close {
-  margin-top: 16px;
-  background: rgba(255,255,255,.1); border: none;
-  color: #fff; font-size: 14px; font-weight: 700;
-  padding: 10px 28px; border-radius: 30px;
-  cursor: pointer; font-family: inherit;
-  transition: background .15s;
-}
-.player-close:hover { background: rgba(255,255,255,.18); }
-.player-label {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(to top, rgba(0,0,0,.8) 0%, transparent 100%);
-  padding: 24px 16px 10px;
-  font-size: 11px; color: rgba(255,255,255,.5);
-  pointer-events: none;
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━ 비밀번호 모달 ━━━━━━━━━━━━━━━━━━━━ */
-.pw-modal {
-  display: none;
-  position: fixed; inset: 0;
-  z-index: 80;
-  background: rgba(0,0,0,.7);
-  align-items: center; justify-content: center;
-  padding: 20px;
-}
-.pw-modal.on { display: flex; }
-.pw-box {
-  background: var(--surf); border: 1px solid var(--border2);
-  border-radius: 18px; padding: 24px;
-  width: 100%; max-width: 320px;
-}
-.pw-box h3 { font-size: 15px; margin-bottom: 14px; }
-.pw-err { font-size: 11px; color: var(--accent3); margin-bottom: 8px; display: none; }
-.pw-btns { display: flex; gap: 8px; margin-top: 10px; }
-.pw-cancel { flex: 1; padding: 10px; background: var(--border); border: none; border-radius: 9px; color: var(--fg2); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-.pw-ok     { flex: 1; padding: 10px; background: var(--accent); border: none; border-radius: 9px; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-
-/* ━━━━━━━━━━━━━━━━━━━━ 설정 모달 ━━━━━━━━━━━━━━━━━━━━ */
-.cfg-modal {
-  display: none;
-  position: fixed; inset: 0;
-  z-index: 80;
-  background: rgba(0,0,0,.8);
-  align-items: flex-end; justify-content: center;
-  padding: 0;
-}
-.cfg-modal.on { display: flex; }
-.cfg-box {
-  background: var(--surf);
-  border-radius: 20px 20px 0 0;
-  border: 1px solid var(--border2);
-  width: 100%;
-  max-width: 540px;
-  padding: 20px 20px 32px;
-}
-.cfg-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
-.cfg-box h3 { font-size: 15px; margin-bottom: 6px; }
-.cfg-box p  { font-size: 12px; color: var(--fg2); margin-bottom: 14px; line-height: 1.6; }
-.cfg-label  { font-size: 11px; color: var(--fg3); margin-bottom: 4px; margin-top: 10px; }
-.cfg-btns   { display: flex; gap: 8px; margin-top: 16px; }
-.cfg-cancel { flex: 1; padding: 11px; background: var(--border); border: none; border-radius: 10px; color: var(--fg2); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-.cfg-save   { flex: 2; padding: 11px; background: var(--accent); border: none; border-radius: 10px; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-.cfg-status { font-size: 12px; margin-top: 10px; padding: 8px 12px; border-radius: 8px; display: none; }
-.cfg-status.ok  { background: rgba(62,207,173,.12); color: var(--accent2); display: block; }
-.cfg-status.err { background: rgba(255,78,107,.12); color: var(--accent3); display: block; }
-
-/* ━━━━━━━━━━━━━━━━━━━━ 설정 버튼 ━━━━━━━━━━━━━━━━━━━━ */
-.cfg-btn {
-  background: transparent; border: 1px solid var(--border2);
-  color: var(--fg2); font-size: 11px; font-weight: 600;
-  padding: 5px 11px; border-radius: 20px;
-  cursor: pointer; font-family: inherit;
-}
-
+/* 플레이어 */
+.player { position: fixed; inset: 0; z-index: 50; background: #000; display: none; flex-direction: column; }
+.player.on { display: flex; }
+.p-bar { display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px; }
+.p-title { flex: 1; min-width: 0; }
+.p-title .l { font-family: var(--cond); font-weight: 600; font-size: 12px; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+.p-title .t { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-btn { padding: 9px 13px; border-radius: 10px; background: var(--raised); color: var(--text); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.p-btn[aria-current="true"] { background: var(--accent); color: var(--accent-ink); }
+.p-btn[hidden] { display: none; }
+.stage { flex: 1; display: grid; place-items: center; min-height: 0; }
+.frame { position: relative; width: 100%; max-width: min(100vw, calc((100dvh - 150px) * 16 / 9)); aspect-ratio: 16 / 9; background: #000; }
+.frame:fullscreen { max-width: none; width: 100vw; height: 100vh; aspect-ratio: auto; }
+.frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.cover-top { position: absolute; left: 0; right: 0; top: 0; height: clamp(44px, 13%, 64px); background: #000; pointer-events: none; z-index: 2; }
+.shield { position: absolute; inset: 0; z-index: 3; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 16px; }
+.shield.on { display: flex; }
+.shield .big { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
+.shield .big svg { width: 24px; height: 24px; margin-left: 4px; }
+.shield p { color: var(--muted); font-size: 14px; }
+.p-foot { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 12px calc(16px + env(safe-area-inset-bottom, 0px)); min-height: 64px; }
+.p-note { color: var(--muted); font-size: 14px; }
 </style>
 </head>
 <body>
 
-<!-- ━━ 헤더 ━━ -->
-<header class="header">
-  <div class="logo" id="logo">
-    <div class="logo-icon">🙈</div>
-    <div class="logo-text">
-      <div class="logo-name">노스포</div>
-      <div class="logo-sub">No Spoiler Sports</div>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <span class="wordmark" aria-label="노스포">노<span class="seal">스포</span></span>
+      <span class="updated" id="updated"></span>
     </div>
-  </div>
-  <div class="header-right">
-    <span class="admin-pill" id="adminPill">관리자</span>
-    <button class="cfg-btn" id="cfgBtn" style="display:none">⚙ DB 설정</button>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-sport="soccer" style="--c:var(--soccer)"><span class="dot"></span>해외축구<span class="n"></span></button>
+      <button class="tab" role="tab" data-sport="baseball" style="--c:var(--baseball)"><span class="dot"></span>KBO<span class="n"></span></button>
+      <button class="tab" role="tab" data-sport="lck" style="--c:var(--lck)"><span class="dot"></span>LCK<span class="n"></span></button>
+      <button class="tab" role="tab" data-sport="ufc" style="--c:var(--ufc)"><span class="dot"></span>UFC<span class="n"></span></button>
+    </nav>
+    <div class="leagues" id="leagues" hidden></div>
   </div>
 </header>
 
-<!-- ━━ 탭 ━━ -->
-<nav class="tabs" id="tabs">
-  <div class="tab active" data-sport="soccer">⚽ 해외축구</div>
-  <div class="tab" data-sport="baseball">⚾ KBO</div>
-  <div class="tab" data-sport="lck">🎮 LCK</div>
-  <div class="tab" data-sport="ufc">🥊 UFC</div>
-</nav>
+<main class="wrap" id="main">
+  <div class="list"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+</main>
 
-<!-- ━━ 페이지 ━━ -->
-<div class="page">
-
-  <!-- 관리자 추가 폼 -->
-  <div class="admin-panel" id="adminPanel">
-    <div class="ap-title">⚙ 경기 추가</div>
-    <div class="ap-grid">
-      <select class="f" id="aeSport">
-        <option value="soccer">⚽ 해외축구</option>
-        <option value="baseball">⚾ KBO</option>
-        <option value="lck">🎮 LCK</option>
-        <option value="ufc">🥊 UFC</option>
-      </select>
-      <input class="f" id="aeLeague" placeholder="대회명 (예: EPL)">
-    </div>
-    <div class="ap-grid full">
-      <input class="f" id="aeTeams" placeholder="팀A vs 팀B">
-    </div>
-    <div class="ap-grid">
-      <input class="f" type="date" id="aeDate">
-      <select class="f" id="aeStatus">
-        <option value="end">경기 종료</option>
-        <option value="soon">경기 예정</option>
-        <option value="live">진행 중</option>
-      </select>
-    </div>
-    <div class="ap-grid full">
-      <input class="f" id="aeScore" placeholder="스코어 (예: 2-1 / 판정승)">
-    </div>
-    <div class="ap-grid full">
-      <input class="f" id="aeHighlight" placeholder="하이라이트 유튜브 URL">
-    </div>
-    <div class="ap-grid full">
-      <input class="f" id="aeFull" placeholder="풀영상 유튜브 URL">
-    </div>
-    <div class="ap-grid full">
-      <input class="f" id="aeLive" placeholder="중계 URL (다음스포츠, 유튜브 등)">
-    </div>
-    <div class="ap-btns">
-      <button class="ap-cancel" id="apClose">닫기</button>
-      <button class="ap-add" id="apAdd">+ 추가</button>
+<div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="pTitle">
+  <div class="p-bar">
+    <div class="p-title"><div class="l" id="pLeague"></div><div class="t" id="pTitle"></div></div>
+    <button class="p-btn" id="pFull" hidden>전체화면</button>
+    <button class="p-btn" id="pClose">닫기</button>
+  </div>
+  <div class="stage">
+    <div class="frame" id="frame">
+      <div id="yt"></div>
+      <div class="cover-top"></div>
+      <div class="shield" id="shield"></div>
     </div>
   </div>
-
-  <!-- 경기 목록 -->
-  <div id="matchArea">
-    <div class="loading">
-      <div class="spinner"></div>
-      <div>불러오는 중…</div>
-    </div>
-  </div>
-
-</div><!-- /page -->
-
-<!-- ━━ 영상 모달 ━━ -->
-<div class="player-modal" id="playerModal">
-  <div class="player-wrap">
-    <iframe id="playerFrame" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>
-    <div class="player-label">youtube-nocookie.com · 타이틀/추천 없음</div>
-  </div>
-  <button class="player-close" id="playerClose">✕ 닫기</button>
-</div>
-
-<!-- ━━ 비밀번호 모달 ━━ -->
-<div class="pw-modal" id="pwModal">
-  <div class="pw-box">
-    <h3>🔑 관리자 모드</h3>
-    <div class="pw-err" id="pwErr">비밀번호가 틀렸습니다</div>
-    <input class="f" type="password" id="pwInput" placeholder="비밀번호">
-    <div class="pw-btns">
-      <button class="pw-cancel" id="pwCancel">취소</button>
-      <button class="pw-ok" id="pwOk">확인</button>
-    </div>
-  </div>
-</div>
-
-<!-- ━━ DB 설정 모달 ━━ -->
-<div class="cfg-modal" id="cfgModal">
-  <div class="cfg-box">
-    <div class="cfg-handle"></div>
-    <h3>⚙ Supabase 연결 설정</h3>
-    <p>Supabase 프로젝트 URL과 anon key를 입력하면 모든 기기에서 경기 데이터를 공유할 수 있어요.<br>설정은 이 기기에만 저장됩니다.</p>
-    <div class="cfg-label">Supabase Project URL</div>
-    <input class="f" id="cfgUrl" placeholder="https://xxxx.supabase.co" style="margin-bottom:0">
-    <div class="cfg-label">Supabase Anon Key</div>
-    <input class="f" id="cfgKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="margin-bottom:0">
-    <div class="cfg-status" id="cfgStatus"></div>
-    <div class="cfg-btns">
-      <button class="cfg-cancel" id="cfgCancel">취소</button>
-      <button class="cfg-save" id="cfgSave">저장 &amp; 연결</button>
-    </div>
-  </div>
+  <div class="p-foot" id="pFoot"></div>
 </div>
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 설정
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const ADMIN_PW   = 'nospo2025';
-const LS_URL_KEY = 'nospo_sb_url';
-const LS_KEY_KEY = 'nospo_sb_key';
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 상태
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Supabase 설정 (SDK 없이 fetch 직접 사용)
-let SB_URL = 'https://bmkkqzcrfcksfujrqsaa.supabase.co';
-let SB_KEY = 'sb_publishable_yD2rwr8W3v6WiWaH6gstew_jNt8fg2H';
-let isAdmin  = false;
-let currentSport = 'soccer';
-let matches  = [];
-let logoClicks = 0, logoTimer = null;
-let pollTimer = null;
-
-function sbHeaders() {
-  return {
-    'apikey': SB_KEY,
-    'Authorization': 'Bearer ' + SB_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=representation'
-  };
-}
-
-async function sbFetch(path, options = {}) {
-  const res = await fetch(SB_URL + '/rest/v1/' + path, {
-    ...options,
-    headers: { ...sbHeaders(), ...(options.headers || {}) }
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
-  const text = await res.text();
-  return text ? JSON.parse(text) : [];
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 유틸
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SPORTS = {
+  soccer: { name: '해외축구', empty: '최근 올라온 해외축구 하이라이트가 없어요.' },
+  baseball: { name: 'KBO', empty: 'KBO는 지금 비시즌이에요. 3월에 개막하면 자동으로 채워져요.' },
+  lck: { name: 'LCK', empty: '최근 올라온 LCK 하이라이트가 없어요.' },
+  ufc: { name: 'UFC', empty: '최근 올라온 UFC 경기 영상이 없어요.' },
+};
+const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>';
 const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
 
-function ytId(url) {
-  if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-  return m ? m[1] : null;
+let data = [];
+let sport = store.get('nospo.sport', 'soccer');
+if (!SPORTS[sport]) sport = 'soccer';
+let league = '전체';
+const watched = new Set(store.get('nospo.watched', []));
+
+// ── 데이터 ──
+function normalize(m) {
+  if (!m.videos) {   // 예전 형식(highlight 필드)도 읽기
+    const id = u => (String(u || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/) || [])[1];
+    m.videos = [];
+    if (id(m.highlight)) m.videos.push({ id: id(m.highlight), kind: 'main', label: '하이라이트' });
+    if (id(m.fullvideo || m.full)) m.videos.push({ id: id(m.fullvideo || m.full), kind: 'full', label: '풀 하이라이트' });
+  }
+  return m;
 }
-
-function ytEmbed(url) {
-  const id = ytId(url);
-  if (!id) return null;
-  return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&color=white`;
-}
-
-function fmtDate(d) {
-  if (!d) return '';
-  const dt = new Date(d + 'T00:00:00');
-  const days = ['일','월','화','수','목','금','토'];
-  return `${dt.getMonth()+1}/${dt.getDate()}(${days[dt.getDay()]})`;
-}
-
-function initDB() {
-  SB_URL = localStorage.getItem(LS_URL_KEY) || '';
-  SB_KEY = localStorage.getItem(LS_KEY_KEY) || '';
-}
-
-async function loadMatches() {
-  renderLoading();
+async function load() {
   try {
-    const res = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) throw new Error(res.status);
-    const d = await res.json();
-    matches = d.matches || [];
-    renderMatches();
+    const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    data = (d.matches || []).map(normalize).filter(m => m.videos.length && m.teams);
+    if (d.updated) {
+      const t = new Date(d.updated);
+      $('updated').textContent = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')} 업데이트`;
+    }
+    render();
   } catch (e) {
-    $('matchArea').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>경기 데이터를 불러오지 못했어요. 잠시 후 새로고침해 주세요.</div>`;
+    $('main').innerHTML = `<div class="state"><b>경기 목록을 불러오지 못했어요</b>인터넷 연결을 확인하고 다시 시도해 주세요.<br><button id="retry">다시 시도</button></div>`;
+    $('retry').onclick = load;
   }
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 렌더
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function renderLoading() {
-  $('matchArea').innerHTML = `<div class="loading"><div class="spinner"></div><div>불러오는 중…</div></div>`;
+// ── 목록 화면 ──
+const LOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+const EN = { '프리미어리그': 'Premier League', '라리가': 'LaLiga', '분데스리가': 'Bundesliga', '세리에A': 'Serie A', '챔피언스리그': 'Champions League', '유로파리그': 'Europa League', '컨퍼런스리그': 'Conference League', '네이션스리그': 'Nations League', '스코틀랜드 리그': 'Scottish Premiership', 'K리그1': 'K League 1', 'K리그2': 'K League 2', 'MLS': 'MLS', 'KBO': 'KBO League', 'KBO 포스트시즌': 'KBO Postseason', 'KBO 한국시리즈': 'Korean Series', 'LCK': 'LCK', '월드 챔피언십': 'Worlds', 'UFC': 'UFC' };
+const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+function dayLabel(d) {
+  const utc = s => { const [y, m, dd] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, dd)); };
+  const dt = utc(d);
+  const today = utc(new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }));
+  const diff = Math.round((today - dt) / 864e5);
+  const code = `${String(dt.getUTCMonth() + 1).padStart(2, '0')}.${String(dt.getUTCDate()).padStart(2, '0')} ${DAYS[dt.getUTCDay()]}`;
+  const name = diff === 0 ? '오늘' : diff === 1 ? '어제' : `${dt.getUTCMonth() + 1}월 ${dt.getUTCDate()}일`;
+  return { name, code };
 }
+const initial = s => (s || '').trim().slice(0, 1).toUpperCase();
+const mainOf = m => m.videos.find(v => v.kind === 'main') || m.videos.find(v => v.kind === 'full') || m.videos[0];
+const playAttr = m => { const v = mainOf(m); return v.kind === 'game' ? `data-play="${esc(m.id)}" data-game="1"` : `data-play="${esc(m.id)}" data-v="${v.id}"`; };
+function render() {
+  document.querySelectorAll('.tab').forEach(t => {
+    t.setAttribute('aria-selected', t.dataset.sport === sport);
+    t.querySelector('.n').textContent = data.filter(m => m.sport === t.dataset.sport).length || '';
+  });
+  const inSport = data.filter(m => m.sport === sport);
+  const leagues = ['전체', ...new Set(inSport.map(m => m.league).filter(Boolean))];
+  if (!leagues.includes(league)) league = '전체';
+  $('leagues').hidden = leagues.length <= 2;
+  $('leagues').innerHTML = leagues.map(l => `<button class="chip" aria-pressed="${l === league}" data-league="${esc(l)}">${esc(l)}</button>`).join('');
 
-function renderMatches() {
-  const list = matches
-    .filter(m => m.sport === currentSport)
-    .sort((a, b) => {
-      const o = { live: 0, end: 1, soon: 2 };
-      if ((o[a.status] ?? 1) !== (o[b.status] ?? 1))
-        return (o[a.status] ?? 1) - (o[b.status] ?? 1);
-      return new Date(b.date || 0) - new Date(a.date || 0);
-    });
-
+  const list = inSport.filter(m => league === '전체' || m.league === league).sort((a, b) => b.date.localeCompare(a.date));
   if (!list.length) {
-    $('matchArea').innerHTML = `<div class="empty"><div class="empty-icon">📋</div>등록된 경기가 없어요</div>`;
+    $('main').innerHTML = `<div class="state"><b>아직 경기가 없어요</b>${SPORTS[sport].empty}</div>`;
     return;
   }
-
-  const html = list.map(m => cardHtml(m)).join('');
-  $('matchArea').innerHTML = `<div class="match-list">${html}</div>`;
-
-  // 이벤트 위임
-  $('matchArea').querySelectorAll('.mc-head').forEach(h => {
-    h.addEventListener('click', () => h.closest('.match-card').classList.toggle('open'));
-  });
-  $('matchArea').querySelectorAll('.score-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const id = btn.dataset.id;
-      $(`sc-${id}`).classList.add('on');
-      btn.style.display = 'none';
-    });
-  });
-  $('matchArea').querySelectorAll('.act-hl-btn').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); openPlayer(btn.dataset.url); });
-  });
-  $('matchArea').querySelectorAll('.act-full-btn').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); openPlayer(btn.dataset.url); });
-  });
-  $('matchArea').querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      e.stopPropagation();
-      await deleteMatch(btn.dataset.id);
-    });
-  });
+  // 아직 안 본 가장 최근 경기를 크게
+  const feat = list.find(m => !m.videos.some(v => watched.has(v.id))) || list[0];
+  const rest = list.filter(m => m !== feat);
+  const days = new Map();
+  rest.forEach(m => days.set(m.date, [...(days.get(m.date) || []), m]));
+  $('main').innerHTML = featureHtml(feat) + [...days].map(([d, ms]) => {
+    const lab = dayLabel(d);
+    return `<section><h2 class="day-head"><b>${lab.name}</b><span>${lab.code}</span></h2><div class="list">${ms.map(rowHtml).join('')}</div></section>`;
+  }).join('') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 3시간마다 자동 업데이트</p>`;
 }
+function featureHtml(m) {
+  const [a, b = ''] = m.teams.split(' vs ');
+  const full = m.videos.find(v => v.kind === 'full' && v !== mainOf(m));
+  const games = mainOf(m).kind !== 'game' && m.videos.some(v => v.kind === 'game' && v.n === 1);
+  const lab = dayLabel(m.date);
+  return `<section style="--c:var(--${m.sport})">
+    <p class="eyebrow">방금 올라온 경기</p>
+    <article class="feature">
+      <div class="meta">${esc(EN[m.league] || m.league)} · ${lab.code}</div>
+      <div class="versus">
+        <div class="side"><span class="mono big">${esc(initial(a))}</span><span class="name">${esc(a)}</span></div>
+        <div class="sealed"><div class="scorebox">?<i>:</i>?</div><small>결과 숨김</small></div>
+        <div class="side"><span class="mono big">${esc(initial(b))}</span><span class="name">${esc(b)}</span></div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" ${playAttr(m)}>${PLAY_ICON}하이라이트 보기</button>
+        ${full ? `<button class="btn" data-play="${esc(m.id)}" data-v="${full.id}">풀 하이라이트</button>` : ''}
+        ${games ? `<button class="btn" data-play="${esc(m.id)}" data-game="1">게임별로</button>` : ''}
+      </div>
+    </article></section>`;
+}
+function rowHtml(m) {
+  const [a, b = ''] = m.teams.split(' vs ');
+  const full = m.videos.find(v => v.kind === 'full' && v !== mainOf(m));
+  const games = mainOf(m).kind !== 'game' && m.videos.some(v => v.kind === 'game' && v.n === 1);
+  const seen = m.videos.some(v => watched.has(v.id));
+  const more = (full ? `<button class="mini" data-play="${esc(m.id)}" data-v="${full.id}">풀 하이라이트</button>` : '')
+    + (games ? `<button class="mini" data-play="${esc(m.id)}" data-game="1">게임별로</button>` : '');
+  return `<article class="row${seen ? ' watched' : ''}" style="--c:var(--${m.sport})">
+    <div class="teams">
+      <div class="meta">${esc(EN[m.league] || m.league)}${seen ? ' · <span class="seen">WATCHED</span>' : ''}</div>
+      <div class="team"><span class="mono">${esc(initial(a))}</span><span>${esc(a)}</span></div>
+      <div class="team"><span class="mono">${esc(initial(b))}</span><span>${esc(b)}</span></div>
+      ${more ? `<div class="more">${more}</div>` : ''}
+    </div>
+    <span class="lock">${LOCK_ICON}? : ?</span>
+    <button class="play" ${playAttr(m)} aria-label="${esc(m.teams)} 재생">${PLAY_ICON}</button>
+  </article>`;
+}
+addEventListener('scroll', () => document.querySelector('.top').classList.toggle('scrolled', scrollY > 4), { passive: true });
 
-function cardHtml(m) {
-  const id = m.id || m.match_id;
-  const pillCls = m.status === 'live' ? 'p-live' : m.status === 'end' ? 'p-end' : 'p-soon';
-  const pillTxt = m.status === 'live' ? '🔴 LIVE' : m.status === 'end' ? '종료' : '예정';
+document.addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (tab) { sport = tab.dataset.sport; league = '전체'; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
+  const chip = e.target.closest('.chip');
+  if (chip) { league = chip.dataset.league; render(); return; }
+  const p = e.target.closest('[data-play]');
+  if (p) {
+    const m = data.find(x => x.id === p.dataset.play);
+    if (!m) return;
+    if (p.dataset.game) openGame(m, 1);
+    else openVideo(m, m.videos.find(v => v.id === p.dataset.v));
+  }
+});
 
-  let scoreHtml = '';
-  if (m.status === 'end' && m.score) {
-    scoreHtml = `
-      <div class="score-wrap">
-        <button class="score-btn" data-id="${id}">🔒 스코어 보기 (스포일러 주의)</button>
-        <div class="score-reveal" id="sc-${id}">${escHtml(m.score)}</div>
-      </div>`;
-  } else if (m.status === 'end') {
-    scoreHtml = '';
-  } else if (m.status === 'live') {
-    scoreHtml = `<div style="font-size:12px;color:var(--accent3);padding:10px 0 6px">🔴 현재 진행 중</div>`;
+// ── 플레이어: 유튜브 제목·추천 영상이 보이지 않게 가림 ──
+let yt = null, ytReady = false, current = null;
+window.onYouTubeIframeAPIReady = () => { ytReady = true; };
+(() => { const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s); })();
+const VARS = { autoplay: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1, fs: 0 };
+
+function shield(html) { $('shield').innerHTML = html; $('shield').classList.toggle('on', !!html); }
+function mountVideo(id) {
+  shield('');
+  if (yt?.loadVideoById) { yt.loadVideoById(id); return; }
+  const el = $('yt');
+  if (el.tagName === 'IFRAME') { el.src = `https://www.youtube-nocookie.com/embed/${id}?${new URLSearchParams(VARS)}`; return; }
+  if (ytReady && window.YT?.Player) {
+    yt = new YT.Player('yt', { host: 'https://www.youtube-nocookie.com', videoId: id, playerVars: VARS, events: { onStateChange: onState } });
   } else {
-    scoreHtml = `<div style="font-size:12px;color:var(--accent2);padding:10px 0 6px">📅 ${fmtDate(m.date)} 예정</div>`;
+    // API가 아직 안 왔으면 일반 임베드로 바로 재생
+    const f = document.createElement('iframe');
+    f.id = 'yt';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture';
+    f.src = `https://www.youtube-nocookie.com/embed/${id}?${new URLSearchParams(VARS)}`;
+    el.replaceWith(f);
   }
-
-  let actions = '';
-  if (m.highlight && ytId(m.highlight)) {
-    actions += `<button class="act act-hl act-hl-btn" data-url="${escHtml(m.highlight)}">🎬 하이라이트</button>`;
-  }
-  if ((m.fullvideo || m.full) && ytId(m.fullvideo || m.full)) {
-    actions += `<button class="act act-full act-full-btn" data-url="${escHtml(m.fullvideo || m.full)}">📺 풀영상</button>`;
-  }
-  if (m.live) {
-    actions += `<a class="act act-live" href="${escHtml(m.live)}" target="_blank" rel="noopener">📡 중계</a>`;
-  }
-  if (!actions) {
-    actions = `<span class="no-link">링크 없음</span>`;
-  }
-
-  const delHtml = isAdmin
-    ? `<div class="del-row"><button class="act act-del del-btn" data-id="${id}" style="width:100%;min-width:0">🗑 삭제</button></div>`
-    : '';
-
-  return `
-    <div class="match-card" data-id="${id}">
-      <div class="mc-head">
-        <span class="status-pill ${pillCls}">${pillTxt}</span>
-        <div class="mc-info">
-          <div class="mc-league">${escHtml(m.league || '')}</div>
-          <div class="mc-teams">${escHtml(m.teams || '')}</div>
-        </div>
-        <span class="mc-date">${fmtDate(m.date)}</span>
-        <span class="mc-chevron">▼</span>
-      </div>
-      <div class="mc-body">
-        ${scoreHtml}
-        <div class="mc-actions">${actions}</div>
-        ${delHtml}
-      </div>
-    </div>`;
 }
-
-function escHtml(s) {
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+function onState(e) {
+  const S = YT.PlayerState;
+  if (e.data === S.PAUSED) {
+    shield(`<button class="big" id="resume" aria-label="계속 보기">${PLAY_ICON}</button><p>일시정지 · 추천 영상은 가려 뒀어요</p>`);
+    $('resume').onclick = () => { shield(''); yt.playVideo(); };
+  } else if (e.data === S.ENDED) {
+    const next = nextGame();
+    shield(next
+      ? `<p>게임 ${current.n} 끝</p><button class="p-btn" id="goNext">게임 ${next.n} 보기</button>`
+      : `<p>영상이 끝났어요</p><button class="p-btn" id="goClose">목록으로</button>`);
+    if (next) $('goNext').onclick = () => openGame(current.match, next.n);
+    else $('goClose').onclick = closePlayer;
+  } else if (e.data === S.PLAYING) {
+    shield('');
+  }
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 영상 플레이어
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function openPlayer(url) {
-  const embed = ytEmbed(url);
-  if (!embed) { window.open(url, '_blank'); return; }
-  $('playerFrame').src = embed;
-  $('playerModal').classList.add('on');
+function markWatched(id) { watched.add(id); store.set('nospo.watched', [...watched].slice(-500)); }
+function show(m, title) {
+  $('pLeague').textContent = m.league || SPORTS[m.sport].name;
+  $('pTitle').textContent = title;
+  $('player').classList.add('on');
   document.body.style.overflow = 'hidden';
+  $('pFull').hidden = !$('frame').requestFullscreen;
 }
-
+function openVideo(m, v) {
+  if (!v) return;
+  current = { match: m, v, n: null };
+  show(m, m.teams);
+  const opts = m.videos.filter(x => x.kind !== 'game');
+  $('pFoot').innerHTML = opts.length > 1
+    ? opts.map(x => `<button class="p-btn" data-v="${x.id}" ${x === v ? 'aria-current="true"' : ''}>${esc(x.label)}</button>`).join('')
+    : '';
+  $('pFoot').querySelectorAll('[data-v]').forEach(b => b.onclick = () => openVideo(m, m.videos.find(x => x.id === b.dataset.v)));
+  mountVideo(v.id); markWatched(v.id);
+}
+// 전체 게임 수가 보이면 스포일러라서, 지금 게임과 "다음 게임" 버튼만 보여 줌
+function nextGame() {
+  if (!current?.n) return null;
+  return current.match.videos.find(x => x.kind === 'game' && x.n === current.n + 1) || null;
+}
+function openGame(m, n) {
+  const v = m.videos.find(x => x.kind === 'game' && x.n === n);
+  if (!v) return;
+  current = { match: m, v, n };
+  show(m, `${m.teams} · 게임 ${n}`);
+  $('pFoot').innerHTML = `<button class="p-btn" id="nextBtn">다음 게임</button>`;
+  $('nextBtn').onclick = () => {
+    const next = nextGame();
+    if (next) openGame(m, next.n);
+    else $('pFoot').innerHTML = `<span class="p-note">이 경기는 게임 ${n}에서 끝났어요</span>`;
+  };
+  mountVideo(v.id); markWatched(v.id);
+}
 function closePlayer() {
-  $('playerFrame').src = '';
-  $('playerModal').classList.remove('on');
+  $('player').classList.remove('on');
   document.body.style.overflow = '';
+  if (yt?.stopVideo) yt.stopVideo();
+  else { const f = $('yt'); if (f?.tagName === 'IFRAME') f.src = 'about:blank'; }
+  if (document.fullscreenElement) document.exitFullscreen();
+  shield('');
+  render();
 }
+$('pClose').onclick = closePlayer;
+$('pFull').onclick = () => document.fullscreenElement ? document.exitFullscreen() : $('frame').requestFullscreen();
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('player').classList.contains('on') && !document.fullscreenElement) closePlayer(); });
 
-$('playerClose').addEventListener('click', closePlayer);
-$('playerModal').addEventListener('click', e => { if (e.target === $('playerModal')) closePlayer(); });
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 경기 추가 / 삭제
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-$('apAdd').addEventListener('click', async () => {
-  const sport     = $('aeSport').value;
-  const league    = $('aeLeague').value.trim();
-  const teams     = $('aeTeams').value.trim();
-  const date      = $('aeDate').value;
-  const status    = $('aeStatus').value;
-  const score     = $('aeScore').value.trim();
-  const highlight = $('aeHighlight').value.trim();
-  const full      = $('aeFull').value.trim();
-  const live      = $('aeLive').value.trim();
-
-  if (!teams || !date) { alert('팀명과 날짜를 입력하세요.'); return; }
-
-  const row = { sport, league, teams, date, status, score, highlight, fullvideo: full, live };
-
-  if (SB_URL && SB_KEY) {
-    try {
-      await sbFetch('matches', { method: 'POST', body: JSON.stringify(row) });
-      await loadMatches();
-    } catch(e) { alert('저장 실패: ' + e.message); return; }
-  } else {
-    matches.unshift({ ...row, id: 'local_' + Date.now() });
-    renderMatches();
-  }
-
-  ['aeTeams','aeScore','aeHighlight','aeFull','aeLive','aeLeague'].forEach(k => { $(k).value = ''; });
-  currentSport = sport;
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.sport === sport));
-  renderMatches();
-});
-
-async function deleteMatch(id) {
-  if (!confirm('삭제할까요?')) return;
-  if (SB_URL && SB_KEY && !id.startsWith('local_')) {
-    try {
-      await sbFetch('matches?id=eq.' + id, { method: 'DELETE' });
-      await loadMatches();
-    } catch(e) { alert('삭제 실패: ' + e.message); }
-  } else {
-    matches = matches.filter(m => (m.id || m.match_id) !== id);
-    renderMatches();
-  }
-}
-
-$('apClose').addEventListener('click', () => {
-  $('adminPanel').classList.remove('on');
-  isAdmin = false;
-  $('adminPill').classList.remove('on');
-  renderMatches();
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 탭
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentSport = tab.dataset.sport;
-    renderMatches();
-  });
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 로고 3번 → 관리자
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-$('logo').addEventListener('click', () => {
-  logoClicks++;
-  clearTimeout(logoTimer);
-  logoTimer = setTimeout(() => { logoClicks = 0; }, 1500);
-  if (logoClicks >= 3) {
-    logoClicks = 0;
-    if (isAdmin) {
-      isAdmin = false;
-      $('adminPill').classList.remove('on');
-      $('adminPanel').classList.remove('on');
-      renderMatches();
-    } else {
-      $('pwInput').value = '';
-      $('pwErr').style.display = 'none';
-      $('pwModal').classList.add('on');
-      setTimeout(() => $('pwInput').focus(), 50);
-    }
-  }
-});
-
-function checkPw() {
-  if ($('pwInput').value === ADMIN_PW) {
-    $('pwModal').classList.remove('on');
-    isAdmin = true;
-    $('adminPill').classList.add('on');
-    $('adminPanel').classList.add('on');
-    renderMatches();
-  } else {
-    $('pwErr').style.display = 'block';
-    $('pwInput').value = '';
-  }
-}
-$('pwOk').addEventListener('click', checkPw);
-$('pwCancel').addEventListener('click', () => $('pwModal').classList.remove('on'));
-$('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// DB 설정 모달
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-$('cfgBtn').addEventListener('click', () => {
-  $('cfgUrl').value = localStorage.getItem(LS_URL_KEY) || '';
-  $('cfgKey').value = localStorage.getItem(LS_KEY_KEY) || '';
-  $('cfgStatus').className = 'cfg-status';
-  $('cfgModal').classList.add('on');
-});
-$('cfgCancel').addEventListener('click', () => $('cfgModal').classList.remove('on'));
-$('cfgModal').addEventListener('click', e => { if (e.target === $('cfgModal')) $('cfgModal').classList.remove('on'); });
-
-$('cfgSave').addEventListener('click', async () => {
-  const url = $('cfgUrl').value.trim();
-  const key = $('cfgKey').value.trim();
-  if (!url || !key) { alert('URL과 Key를 모두 입력하세요.'); return; }
-
-  $('cfgSave').textContent = '연결 중…';
-  try {
-    // 연결 테스트
-    const testUrl = url.replace(/\/$/, '');
-    const res = await fetch(testUrl + '/rest/v1/matches?select=id&limit=1', {
-      headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
-    });
-    if (!res.ok) throw new Error('응답 오류: ' + res.status);
-    localStorage.setItem(LS_URL_KEY, testUrl);
-    localStorage.setItem(LS_KEY_KEY, key);
-    SB_URL = testUrl;
-    SB_KEY = key;
-    $('cfgStatus').textContent = '✅ 연결 성공! 경기 데이터를 불러옵니다.';
-    $('cfgStatus').className = 'cfg-status ok';
-    setTimeout(() => {
-      $('cfgModal').classList.remove('on');
-      loadMatches();
-    }, 1200);
-  } catch(e) {
-    $('cfgStatus').textContent = '❌ 연결 실패: ' + (e.message || '설정을 확인하세요.');
-    $('cfgStatus').className = 'cfg-status err';
-  }
-  $('cfgSave').textContent = '저장 & 연결';
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 시드 (Supabase 없을 때)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 초기화
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-loadMatches();
-setInterval(loadMatches, 5 * 60 * 1000);
+load();
+setInterval(() => { if (!$('player').classList.contains('on')) load(); }, 10 * 60 * 1000);
 </script>
 </body>
 </html>
