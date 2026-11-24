@@ -4,8 +4,8 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const VERSION = 4;
 const KEEP_DAYS = 60;          // 이 기간 안의 경기만 보관
-const MAX_DATE_LOOKUPS = 150;
-const PAGE_ITEMS = 40;         // 재생목록/채널 페이지에서 최신 몇 개까지 볼지  // 한 번 실행에 날짜 조회할 최대 영상 수
+const MAX_DATE_LOOKUPS = 150;  // 한 번 실행에 영상 페이지로 날짜 조회할 최대 수
+const PAGE_ITEMS = 40;         // 재생목록/채널 페이지에서 최신 몇 개까지 볼지
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36',
@@ -165,7 +165,7 @@ for (const src of sources) {
   }
 }
 
-// 날짜 없는 영상은 영상 페이지에서 업로드 날짜 확인 (한 번 확인하면 저장해 둠)
+// 날짜: RSS → 제목 속 날짜 → "N시간 전" 순서로 정하고, 몇 주 전 영상만 영상 페이지에서 다시 확인
 for (const f of found) {
   if (f.date) { dateCache[f.id] = f.date; continue; }
   if (dateCache[f.id]) continue;
@@ -173,7 +173,7 @@ for (const f of found) {
   if (td) { dateCache[f.id] = td; continue; }
   const ad = agoDate(f.ago);
   if (ad && !ad.coarse) dateCache[f.id] = ad.date;
-  else if (ad) f.coarse = ad.date;   // 몇 주 전 영상: 아래에서 영상 페이지로 정확한 날짜를 다시 시도
+  else if (ad) f.coarse = ad.date;
 }
 const need = [...new Set(found.filter(f => !dateCache[f.id]).map(f => f.id))].slice(0, MAX_DATE_LOOKUPS);
 for (let i = 0; i < need.length; i += 8) {
