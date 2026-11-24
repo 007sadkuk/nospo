@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const VERSION = 4;
 const KEEP_DAYS = 60;          // 이 기간 안의 경기만 보관
-const MAX_DATE_LOOKUPS = 600;
+const MAX_DATE_LOOKUPS = 150;
 const PAGE_ITEMS = 40;         // 재생목록/채널 페이지에서 최신 몇 개까지 볼지  // 한 번 실행에 날짜 조회할 최대 영상 수
 
 const HEADERS = {
@@ -31,8 +31,11 @@ function lockups(data) {
   const out = [];
   JSON.stringify(data, (k, v) => {
     if (k === 'lockupViewModel' && v?.contentId && v.contentId.length === 11) {
-      const t = v.metadata?.lockupMetadataViewModel?.title?.content;
-      if (t) out.push({ id: v.contentId, title: t });
+      const md = v.metadata?.lockupMetadataViewModel;
+      const t = md?.title?.content;
+      const rows = (md?.metadata?.contentMetadataViewModel?.metadataRows || [])
+        .flatMap(r => (r.metadataParts || []).map(p => p.text?.content || '')).join(' ');
+      if (t) out.push({ id: v.contentId, title: t, ago: rows });
     }
     if (k === 'playlistVideoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '' });
     if (k === 'videoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '' });
@@ -68,6 +71,25 @@ async function collect(src) {
   return [...items.values()];
 }
 
+// ── 날짜 추정 ─────────────────────────────────────────
+// 1) RSS의 정확한 업로드 시각  2) 제목 속 날짜(10/12, 11.04)  3) "3시간 전" 같은 상대 시간
+const UNIT = { 초: 1e3, 분: 6e4, 시간: 36e5, 일: 864e5, 주: 6048e5, 개월: 2592e6, 년: 31536e6 };
+function agoDate(text) {
+  const m = (text || '').match(/(\d+)\s*(초|분|시간|일|주|개월|년)\s*전/);
+  if (!m) return null;
+  return { date: kstDate(new Date(Date.now() - Number(m[1]) * UNIT[m[2]]).toISOString()), coarse: ['주', '개월', '년'].includes(m[2]) };
+}
+function titleDate(title, ref) {
+  const m = title.match(/(?:^|[\s(\[])(\d{1,2})[./](\d{1,2})(?=[\s)\]]|경기|$)/);
+  if (!m) return null;
+  const mo = Number(m[1]), d = Number(m[2]);
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const now = new Date(ref || Date.now());
+  let y = now.getUTCFullYear();
+  if (mo > now.getUTCMonth() + 2) y -= 1;   // 12월에 1월 날짜 등 연도 넘어감 처리
+  return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
 // ── 제목 해석 (점수·결과는 절대 저장하지 않음) ─────────────
 const VS = /\s(?:vs\.?|VS|Vs|v)\s/;
 function parseTeams(title) {
@@ -80,6 +102,7 @@ function parseTeams(title) {
     .replace(/ㅣ.*$/, ' ')
     .replace(/\d+\s*[-:]\s*\d+/g, ' ')
     .replace(/(^|\s)\d+R(?=\s|$)/g, ' ')
+    .replace(/(^|\s)(플레이오프|준플레이오프|와일드카드|\d+차전|준결승|결승전?|8강|4강|16강)(?=\s|$)/g, ' ')
     .replace(/(^|\s)\d+라운드(?=\s|$)/g, ' ')
     .replace(/(^|\s)게임\s*\d+/g, ' ')
     .replace(/\d+\s*분/g, ' ')
@@ -143,7 +166,15 @@ for (const src of sources) {
 }
 
 // 날짜 없는 영상은 영상 페이지에서 업로드 날짜 확인 (한 번 확인하면 저장해 둠)
-for (const f of found) if (f.date) dateCache[f.id] = f.date;
+for (const f of found) {
+  if (f.date) { dateCache[f.id] = f.date; continue; }
+  if (dateCache[f.id]) continue;
+  const td = titleDate(f.title);
+  if (td) { dateCache[f.id] = td; continue; }
+  const ad = agoDate(f.ago);
+  if (ad && !ad.coarse) dateCache[f.id] = ad.date;
+  else if (ad) f.coarse = ad.date;   // 몇 주 전 영상: 아래에서 영상 페이지로 정확한 날짜를 다시 시도
+}
 const need = [...new Set(found.filter(f => !dateCache[f.id]).map(f => f.id))].slice(0, MAX_DATE_LOOKUPS);
 for (let i = 0; i < need.length; i += 8) {
   await Promise.all(need.slice(i, i + 8).map(async id => {
@@ -155,7 +186,9 @@ for (let i = 0; i < need.length; i += 8) {
     } catch {}
   }));
 }
-console.log(`날짜 조회 ${need.length}개`);
+let fallback = 0;
+for (const f of found) if (!dateCache[f.id] && f.coarse) { dateCache[f.id] = f.coarse; fallback++; }
+console.log(`날짜 조회 ${need.length}개 · 대략 날짜 ${fallback}개`);
 
 // 같은 경기(같은 종목·팀, 날짜 하루 이내)의 영상들을 한 카드로 묶음
 const cutoff = new Date(Date.now() - KEEP_DAYS * 864e5).toISOString().slice(0, 10);
