@@ -108,7 +108,7 @@ main { display: flex; flex-direction: column; gap: 24px; padding-block: 10px 48p
 .frame { position: relative; width: 100%; max-width: min(100vw, calc((100dvh - 150px) * 16 / 9)); aspect-ratio: 16 / 9; background: #000; }
 .frame:fullscreen { max-width: none; width: 100vw; height: 100vh; aspect-ratio: auto; }
 .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.cover-top { position: absolute; left: 0; right: 0; top: 0; height: clamp(44px, 13%, 64px); background: #000; pointer-events: none; z-index: 2; }
+.cover-top { position: absolute; left: 0; top: 0; width: calc(100% - 120px); height: clamp(44px, 13%, 64px); background: linear-gradient(90deg, #000 85%, transparent); pointer-events: none; z-index: 2; }
 .shield { position: absolute; inset: 0; z-index: 3; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 16px; }
 .shield.on { display: flex; }
 .shield .big { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
@@ -143,6 +143,7 @@ main { display: flex; flex-direction: column; gap: 24px; padding-block: 10px 48p
 <div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="pTitle">
   <div class="p-bar">
     <div class="p-title"><div class="l" id="pLeague"></div><div class="t" id="pTitle"></div></div>
+    <button class="p-btn" id="pCC">자막 켜기</button>
     <button class="p-btn" id="pFull" hidden>전체화면</button>
     <button class="p-btn" id="pClose">닫기</button>
   </div>
@@ -244,7 +245,7 @@ function render() {
   $('main').innerHTML = featureHtml(feat) + [...days].map(([d, ms]) => {
     const lab = dayLabel(d);
     return `<section><h2 class="day-head"><b>${lab.name}</b><span>${lab.code}</span></h2><div class="list">${ms.map(rowHtml).join('')}</div></section>`;
-  }).join('') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 3시간마다 자동 업데이트</p>`;
+  }).join('') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 1시간마다 자동 업데이트</p>`;
 }
 function featureHtml(m) {
   const [a, b = ''] = m.teams.split(' vs ');
@@ -305,7 +306,14 @@ document.addEventListener('click', e => {
 let yt = null, ytReady = false, current = null;
 window.onYouTubeIframeAPIReady = () => { ytReady = true; };
 (() => { const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s); })();
-const VARS = { autoplay: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1, fs: 0 };
+const VARS = { autoplay: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1, fs: 0, cc_load_policy: 0, hl: 'ko' };
+let ccOn = false;
+function setCC(on) {
+  ccOn = on;
+  $('pCC').textContent = on ? '자막 끄기' : '자막 켜기';
+  if (!yt?.unloadModule) return;
+  try { if (on) { yt.loadModule('captions'); yt.setOption('captions', 'track', { languageCode: 'ko' }); } else { yt.unloadModule('captions'); yt.unloadModule('cc'); } } catch {}
+}
 
 function shield(html) { $('shield').innerHTML = html; $('shield').classList.toggle('on', !!html); }
 function mountVideo(id) {
@@ -314,7 +322,7 @@ function mountVideo(id) {
   const el = $('yt');
   if (el.tagName === 'IFRAME') { el.src = `https://www.youtube-nocookie.com/embed/${id}?${new URLSearchParams(VARS)}`; return; }
   if (ytReady && window.YT?.Player) {
-    yt = new YT.Player('yt', { host: 'https://www.youtube-nocookie.com', videoId: id, playerVars: VARS, events: { onStateChange: onState } });
+    yt = new YT.Player('yt', { host: 'https://www.youtube-nocookie.com', videoId: id, playerVars: VARS, events: { onStateChange: onState, onReady: () => setCC(false), onApiChange: () => { if (!ccOn) setCC(false); } } });
   } else {
     // API가 아직 안 왔으면 일반 임베드로 바로 재생
     const f = document.createElement('iframe');
@@ -338,6 +346,7 @@ function onState(e) {
     else $('goClose').onclick = closePlayer;
   } else if (e.data === S.PLAYING) {
     shield('');
+    if (!ccOn) setCC(false);
   }
 }
 function markWatched(id) { watched.add(id); store.set('nospo.watched', [...watched].slice(-500)); }
@@ -387,6 +396,7 @@ function closePlayer() {
   render();
 }
 $('pClose').onclick = closePlayer;
+$('pCC').onclick = () => setCC(!ccOn);
 $('pFull').onclick = () => document.fullscreenElement ? document.exitFullscreen() : $('frame').requestFullscreen();
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('player').classList.contains('on') && !document.fullscreenElement) closePlayer(); });
 
