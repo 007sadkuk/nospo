@@ -200,7 +200,8 @@ for (const f of found.sort((x, y) => (dateCache[y.id] || '').localeCompare(dateC
   seen.add(f.id);
   const teams = `${f.a} vs ${f.b}`;
   const day = Date.parse(date);
-  let m = matches.find(x => x.sport === f.sport && x.teams === teams && Math.abs(Date.parse(x.date) - day) <= 864e5);
+  const win = (f.sport === 'lck' ? 4 : 1) * 864e5;   // LCK는 같은 시리즈 영상 날짜가 조금씩 달라서 넉넉히 묶음
+  let m = matches.find(x => x.sport === f.sport && x.teams === teams && Math.abs(Date.parse(x.date) - day) <= win);
   if (!m) {
     m = { id: f.id, sport: f.sport, league: f.league, teams, date, videos: [] };
     matches.push(m);
