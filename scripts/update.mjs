@@ -62,7 +62,7 @@ async function collect(src) {
   const add = list => list.forEach(x => { if (!items.has(x.id) || x.date) items.set(x.id, { ...items.get(x.id), ...x }); });
   if (src.search) {
     // 채널 안 검색 결과 (최신 목록에서 밀려난 경기도 찾을 수 있음)
-    add(lockups(initialData(await get(`https://www.youtube.com/${src.handle}/search?query=${encodeURIComponent(src.search)}`))).slice(0, PAGE_ITEMS));
+    add(lockups(initialData(await get(`https://www.youtube.com/${src.handle}/search?query=${encodeURIComponent(src.search)}&hl=ko&gl=KR`))).slice(0, PAGE_ITEMS));
   } else if (src.playlist) {
     add(lockups(initialData(await get('https://www.youtube.com/playlist?list=' + src.playlist))).slice(0, PAGE_ITEMS));
     add(await rss('playlist_id=' + src.playlist));
@@ -77,8 +77,11 @@ async function collect(src) {
 // ── 날짜 추정 ─────────────────────────────────────────
 // 1) RSS의 정확한 업로드 시각  2) 제목 속 날짜(10/12, 11.04)  3) "3시간 전" 같은 상대 시간
 const UNIT = { 초: 1e3, 분: 6e4, 시간: 36e5, 일: 864e5, 주: 6048e5, 개월: 2592e6, 년: 31536e6 };
+const EN_UNIT = { second: '초', minute: '분', hour: '시간', day: '일', week: '주', month: '개월', year: '년' };
 function agoDate(text) {
-  const m = (text || '').match(/(\d+)\s*(초|분|시간|일|주|개월|년)\s*전/);
+  // GitHub 서버에서는 유튜브가 영어로 보여줄 때가 있어서 "3 weeks ago"도 읽음
+  let m = (text || '').match(/(\d+)\s*(초|분|시간|일|주|개월|년)\s*전/);
+  if (!m) { const e = (text || '').match(/(\d+)\s*(second|minute|hour|day|week|month|year)s?\s*ago/i); if (e) m = [e[0], e[1], EN_UNIT[e[2].toLowerCase()]]; }
   if (!m) return null;
   return { date: kstDate(new Date(Date.now() - Number(m[1]) * UNIT[m[2]]).toISOString()), coarse: ['주', '개월', '년'].includes(m[2]) };
 }
