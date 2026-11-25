@@ -77,6 +77,86 @@
   ]
  },
  {
+  "sport": "soccer",
+  "handle": "@CoupangPlaySports",
+  "search": "프리미어리그 2분 하이라이트",
+  "must": [
+   "하이라이트"
+  ],
+  "leagueFromBracket": true,
+  "bracketAllow": [
+   "프리미어리그",
+   "라리가",
+   "분데스리가",
+   "K리그1",
+   "K리그2"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "handle": "@CoupangPlaySports",
+  "search": "라리가 2분 하이라이트",
+  "must": [
+   "하이라이트"
+  ],
+  "leagueFromBracket": true,
+  "bracketAllow": [
+   "프리미어리그",
+   "라리가",
+   "분데스리가",
+   "K리그1",
+   "K리그2"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "handle": "@CoupangPlaySports",
+  "search": "분데스리가 2분 하이라이트",
+  "must": [
+   "하이라이트"
+  ],
+  "leagueFromBracket": true,
+  "bracketAllow": [
+   "프리미어리그",
+   "라리가",
+   "분데스리가",
+   "K리그1",
+   "K리그2"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "handle": "@CoupangPlaySports",
+  "search": "K리그1 하이라이트",
+  "must": [
+   "하이라이트"
+  ],
+  "leagueFromBracket": true,
+  "bracketAllow": [
+   "프리미어리그",
+   "라리가",
+   "분데스리가",
+   "K리그1",
+   "K리그2"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "handle": "@CoupangPlaySports",
+  "search": "K리그2 하이라이트",
+  "must": [
+   "하이라이트"
+  ],
+  "leagueFromBracket": true,
+  "bracketAllow": [
+   "프리미어리그",
+   "라리가",
+   "분데스리가",
+   "K리그1",
+   "K리그2"
+  ]
+ },
+ {
   "sport": "baseball",
   "league": "KBO",
   "playlist": "PLQSdHthiYH--pEoRrL9NEQqwzFQTz1TSw",
@@ -137,19 +217,7 @@
   "league": "NBA",
   "playlist": "PLWTZYHe9YKAL3MGsPyiySRRP-PEsIJdEu",
   "must": [
-   "하이라이트"
-  ]
- },
- {
-  "sport": "basketball",
-  "league": "NBA",
-  "handle": "@CoupangPlaySports",
-  "must": [
-   "하이라이트"
-  ],
-  "leagueFromBracket": true,
-  "bracketAllow": [
-   "NBA"
+   "요약 l NBA"
   ]
  },
  {
@@ -184,6 +252,24 @@
   "sport": "ufc",
   "league": "UFC",
   "handle": "@tvNSPORTS",
+  "must": [
+   "[UFC"
+  ]
+ },
+ {
+  "sport": "basketball",
+  "league": "NBA",
+  "handle": "@CoupangPlaySports",
+  "search": "NBA 1분 요약",
+  "must": [
+   "요약 l NBA"
+  ]
+ },
+ {
+  "sport": "ufc",
+  "league": "UFC",
+  "handle": "@tvNSPORTS",
+  "search": "UFC",
   "must": [
    "[UFC"
   ]
