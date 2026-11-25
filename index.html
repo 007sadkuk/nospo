@@ -16,7 +16,7 @@
   --bg: #0D1118; --panel: #141A24; --card: #18202C; --card-hi: #1F2937; --line: #263040;
   --text: #F2F5FA; --muted: #8A96AA; --faint: #556178;
   --red: #FF3653; --red-ink: #FFFFFF;
-  --soccer: #2FD07F; --baseball: #FF7A3D; --lck: #5B8CFF; --ufc: #FF3653;
+  --soccer: #2FD07F; --baseball: #FF7A3D; --basketball: #FFB020; --lck: #5B8CFF; --ufc: #FF3653; --blue: #3B82F6;
   --font: 'Pretendard', 'Gothic A1', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --display: 'Black Han Sans', 'Gothic A1', sans-serif;
   --cond: 'Barlow Condensed', 'Gothic A1', sans-serif;
@@ -32,6 +32,7 @@ button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 /* 상단 바 */
 .top { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
 .brand { display: flex; align-items: center; gap: 10px; padding-block: 12px; }
+.home { display: flex; align-items: center; gap: 10px; color: inherit; }
 .wordmark { font-family: var(--display); font-size: 26px; line-height: 1; letter-spacing: -.5px; display: flex; align-items: center; }
 .wordmark .seal { background: var(--red); color: #fff; border-radius: 5px; padding: 3px 6px 1px; margin-left: 2px; transform: skewX(-8deg); display: inline-block; }
 .tag { font-family: var(--cond); font-weight: 700; font-size: 12px; letter-spacing: .12em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; }
@@ -40,16 +41,23 @@ button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .updated:empty { display: none; }
 
 /* 종목 메뉴 */
-.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding-bottom: 12px; }
+.tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding-bottom: 12px; }
 .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 9px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); font-weight: 700; font-size: 13px; position: relative; }
 .tab .ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 14%, transparent); color: var(--c); }
 .tab .ico svg { width: 18px; height: 18px; }
-.tab .n { position: absolute; top: 6px; right: 7px; font-family: var(--cond); font-weight: 700; font-size: 12px; color: var(--faint); }
+.tab .n { position: absolute; top: 5px; right: 6px; font-family: var(--cond); font-weight: 700; font-size: 12px; color: var(--faint); }
 .tab[aria-selected="true"] { color: var(--text); border-color: var(--c); background: linear-gradient(180deg, color-mix(in srgb, var(--c) 20%, var(--panel)), var(--panel)); }
 .tab[aria-selected="true"] .ico { background: var(--c); color: #0D1118; }
 .tab[aria-selected="true"] .n { color: var(--text); }
-@media (min-width: 720px) { .tabs { grid-template-columns: repeat(4, 160px); } .tab { flex-direction: row; justify-content: center; gap: 8px; font-size: 14px; } .tab .n { position: static; } }
-.leagues { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 12px; }
+@media (min-width: 720px) { .tabs { grid-template-columns: repeat(5, 150px); } .tab { flex-direction: row; justify-content: center; gap: 8px; font-size: 14px; } .tab .n { position: static; } }
+.tools { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; }
+.cal { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; font-weight: 700; color: var(--text); }
+.cal svg { width: 14px; height: 14px; }
+.cal input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.cal.on { background: var(--red); border-color: var(--red); color: #fff; }
+.leagues { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 1; }
+.datebar { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); font-weight: 700; }
+.datebar button { margin-left: auto; font-size: 13px; color: var(--muted); text-decoration: underline; }
 .leagues::-webkit-scrollbar { display: none; }
 .leagues[hidden] { display: none; }
 .chip { flex-shrink: 0; padding: 6px 12px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--muted); }
@@ -80,9 +88,46 @@ main { padding-block: 16px 48px; display: flex; flex-direction: column; gap: 26p
 .watch { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 8px; border-radius: 9px; background: var(--red); color: var(--red-ink); font-weight: 800; font-size: 14px; white-space: nowrap; }
 .watch svg { width: 12px; height: 12px; }
 .sub { padding: 10px; border-radius: 9px; background: var(--card-hi); font-size: 13px; font-weight: 700; white-space: nowrap; }
-.card.watched { opacity: .5; }
-.card.watched .watch { background: var(--card-hi); color: var(--muted); }
-.seen { position: absolute; top: 40px; right: 8px; font-size: 10px; font-weight: 800; color: var(--muted); }
+.seen { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; color: var(--soccer); flex-shrink: 0; }
+
+/* 맨 위 큰 경기 */
+.hero { border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background:
+  radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--c) 38%, transparent), transparent 60%),
+  radial-gradient(90% 80% at 100% 100%, color-mix(in srgb, var(--red) 22%, transparent), transparent 60%), var(--card);
+  padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.hero .kicker { display: flex; align-items: center; gap: 8px; font-family: var(--cond); font-weight: 700; letter-spacing: .1em; font-size: 13px; color: var(--muted); text-transform: uppercase; }
+.hero .kicker b { background: var(--red); color: #fff; padding: 2px 7px; border-radius: 4px; letter-spacing: .06em; }
+.hero .vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; text-align: center; }
+.hero .side { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.hero .crest { width: 58px; height: 58px; font-size: 22px; }
+.hero .nm { font-weight: 900; font-size: 19px; line-height: 1.2; overflow-wrap: anywhere; }
+.hero .q { font-family: var(--cond); font-weight: 700; font-size: 34px; color: var(--faint); display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.hero .q small { font-family: var(--font); font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 6px; }
+.hero .row { display: flex; gap: 8px; }
+.hero .watch { padding: 14px; font-size: 16px; }
+@media (min-width: 720px) { .hero { flex-direction: row; align-items: center; padding: 22px 26px; } .hero .vs { flex: 1; } .hero .row { flex-direction: column; width: 220px; } }
+
+/* 야구·농구: 전광판형 */
+.board .card-body { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px; padding: 14px 10px; }
+.board .bt { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; flex: 1; text-align: center; font-weight: 800; font-size: 14px; }
+.board .bt span:last-child { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board .bq { font-family: var(--cond); font-weight: 700; font-size: 20px; color: var(--faint); padding: 4px 8px; border-radius: 6px; background: var(--bg); }
+
+/* LCK: 팀 태그형 */
+.esports .card-body { gap: 8px; }
+.esports .tagrow { display: flex; align-items: center; gap: 8px; }
+.esports .ttag { flex: 1; text-align: center; font-family: var(--cond); font-weight: 700; font-size: 22px; letter-spacing: .04em; padding: 8px 4px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); }
+.esports .ttag:first-child { border-color: color-mix(in srgb, var(--c) 70%, var(--line)); }
+.esports .x { font-family: var(--cond); font-weight: 700; color: var(--faint); }
+.esports .series { font-size: 11px; font-weight: 700; color: var(--muted); text-align: center; }
+
+/* UFC: 레드·블루 코너 */
+.fight .card-body { gap: 6px; }
+.fight .corner { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; font-weight: 800; font-size: 15px; background: var(--bg); border-left: 4px solid var(--red); min-width: 0; }
+.fight .corner.blue { border-left-color: var(--blue); }
+.fight .corner span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fight .corner small { font-family: var(--cond); font-weight: 700; font-size: 11px; letter-spacing: .08em; color: var(--muted); flex-shrink: 0; }
+.fight .vsx { text-align: center; font-family: var(--cond); font-weight: 700; font-size: 13px; color: var(--faint); line-height: 1; }
 
 .state { text-align: center; padding: 64px 16px; color: var(--muted); }
 .state b { display: block; color: var(--text); font-size: 16px; margin-bottom: 6px; }
@@ -105,7 +150,8 @@ main { padding-block: 16px 48px; display: flex; flex-direction: column; gap: 26p
 .frame { position: relative; width: 100%; max-width: min(100vw, calc((100dvh - 150px) * 16 / 9)); aspect-ratio: 16 / 9; background: #000; }
 .frame:fullscreen { max-width: none; width: 100vw; height: 100vh; aspect-ratio: auto; }
 .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.cover-top { position: absolute; left: 0; top: 0; width: calc(100% - 120px); height: clamp(44px, 13%, 64px); background: linear-gradient(90deg, #000 85%, transparent); pointer-events: none; z-index: 2; }
+.cover-top { position: absolute; left: 0; top: 0; width: calc(100% - 120px); height: clamp(44px, 13%, 64px); background: linear-gradient(90deg, #000 85%, transparent); pointer-events: none; z-index: 2; opacity: 0; transition: opacity .3s; }
+.cover-top.on { opacity: 1; }
 .shield { position: absolute; inset: 0; z-index: 3; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 16px; }
 .shield.on { display: flex; }
 .shield .big { width: 64px; height: 64px; border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; }
@@ -120,16 +166,20 @@ main { padding-block: 16px 48px; display: flex; flex-direction: column; gap: 26p
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <span class="wordmark" aria-label="노스포">노<span class="seal">스포</span></span><span class="tag">NO SPOILER</span>
+      <button class="home" id="home" aria-label="노스포 홈"><span class="wordmark">노<span class="seal">스포</span></span><span class="tag">NO SPOILER</span></button>
       <span class="updated" id="updated"></span>
     </div>
     <nav class="tabs" role="tablist">
-      <button class="tab" role="tab" data-sport="soccer" style="--c:var(--soccer)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.5 4.5h-5L8 10z" fill="currentColor" stroke="none"/></svg></span>해외축구<span class="n"></span></button>
-      <button class="tab" role="tab" data-sport="baseball" style="--c:var(--baseball)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M7 5c2 4 2 10 0 14M17 5c-2 4-2 10 0 14"/></svg></span>KBO<span class="n"></span></button>
+      <button class="tab" role="tab" data-sport="soccer" style="--c:var(--soccer)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.5 4.5h-5L8 10z" fill="currentColor" stroke="none"/></svg></span>축구<span class="n"></span></button>
+      <button class="tab" role="tab" data-sport="baseball" style="--c:var(--baseball)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M7 5c2 4 2 10 0 14M17 5c-2 4-2 10 0 14"/></svg></span>야구<span class="n"></span></button>
+      <button class="tab" role="tab" data-sport="basketball" style="--c:var(--basketball)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></svg></span>농구<span class="n"></span></button>
       <button class="tab" role="tab" data-sport="lck" style="--c:var(--lck)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="16" cy="11.5" r="1" fill="currentColor"/><circle cx="18" cy="13.5" r="1" fill="currentColor"/></svg></span>LCK<span class="n"></span></button>
       <button class="tab" role="tab" data-sport="ufc" style="--c:var(--ufc)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 11V7a3 3 0 0 1 3-3h4a4 4 0 0 1 4 4v5a6 6 0 0 1-6 6h-1a4 4 0 0 1-4-4v-1"/><path d="M7 11h6"/></svg></span>UFC<span class="n"></span></button>
     </nav>
-    <div class="leagues" id="leagues" hidden></div>
+    <div class="tools">
+      <label class="cal" id="calBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span id="calText">날짜</span><input type="date" id="calInput" aria-label="날짜로 경기 찾기"></label>
+      <div class="leagues" id="leagues"></div>
+    </div>
   </div>
 </header>
 
@@ -147,7 +197,7 @@ main { padding-block: 16px 48px; display: flex; flex-direction: column; gap: 26p
   <div class="stage">
     <div class="frame" id="frame">
       <div id="yt"></div>
-      <div class="cover-top"></div>
+      <div class="cover-top" id="coverTop"></div>
       <div class="shield" id="shield"></div>
     </div>
   </div>
@@ -156,10 +206,11 @@ main { padding-block: 16px 48px; display: flex; flex-direction: column; gap: 26p
 
 <script>
 const SPORTS = {
-  soccer: { name: '해외축구', empty: '최근 올라온 해외축구 하이라이트가 없어요.' },
-  baseball: { name: 'KBO', empty: 'KBO는 지금 비시즌이에요. 3월에 개막하면 자동으로 채워져요.' },
-  lck: { name: 'LCK', empty: '최근 올라온 LCK 하이라이트가 없어요.' },
-  ufc: { name: 'UFC', empty: '최근 올라온 UFC 경기 영상이 없어요.' },
+  soccer: { name: '축구', empty: '최근 2주 동안 올라온 축구 하이라이트가 없어요.' },
+  baseball: { name: '야구', empty: 'KBO는 지금 비시즌이에요. 3월에 개막하면 자동으로 채워져요. 지난 경기는 달력으로 찾아보세요.' },
+  basketball: { name: '농구', empty: '최근 2주 동안 올라온 농구 하이라이트가 없어요.' },
+  lck: { name: 'LCK', empty: '최근 2주 동안 올라온 LCK 하이라이트가 없어요. 지난 경기는 달력으로 찾아보세요.' },
+  ufc: { name: 'UFC', empty: '최근 2주 동안 올라온 UFC 경기 영상이 없어요. 지난 경기는 달력으로 찾아보세요.' },
 };
 const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>';
 const $ = id => document.getElementById(id);
@@ -173,6 +224,9 @@ let data = [];
 let sport = store.get('nospo.sport', 'soccer');
 if (!SPORTS[sport]) sport = 'soccer';
 let league = '전체';
+let pickDate = null;   // 달력에서 고른 날짜 (없으면 최근 2주)
+const RECENT_DAYS = 14;
+const todayKST = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
 const watched = new Set(store.get('nospo.watched', []));
 
 // ── 데이터 ──
@@ -204,7 +258,7 @@ async function load() {
 
 // ── 목록 화면 ──
 const LOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
-const EN = { '프리미어리그': 'Premier League', '라리가': 'LaLiga', '분데스리가': 'Bundesliga', '세리에A': 'Serie A', '챔피언스리그': 'Champions League', '유로파리그': 'Europa League', '컨퍼런스리그': 'Conference League', '네이션스리그': 'Nations League', '스코틀랜드 리그': 'Scottish Premiership', 'K리그1': 'K League 1', 'K리그2': 'K League 2', 'MLS': 'MLS', 'KBO': 'KBO League', 'KBO 포스트시즌': 'KBO Postseason', 'KBO 한국시리즈': 'Korean Series', 'LCK': 'LCK', '월드 챔피언십': 'Worlds', 'UFC': 'UFC' };
+const EN = { '프리미어리그': 'Premier League', '라리가': 'LaLiga', '분데스리가': 'Bundesliga', '세리에A': 'Serie A', '챔피언스리그': 'Champions League', '유로파리그': 'Europa League', '컨퍼런스리그': 'Conference League', '네이션스리그': 'Nations League', '스코틀랜드 리그': 'Scottish Premiership', 'K리그1': 'K League 1', 'K리그2': 'K League 2', 'MLS': 'MLS', 'KBO': 'KBO League', 'KBO 포스트시즌': 'KBO Postseason', 'KBO 한국시리즈': 'Korean Series', 'KBL': 'KBL', 'WKBL': 'WKBL', 'NBA': 'NBA', 'LCK': 'LCK', '월드 챔피언십': 'Worlds', 'UFC': 'UFC' };
 const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 function dayLabel(d) {
   const utc = s => { const [y, m, dd] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, dd)); };
@@ -218,51 +272,90 @@ function dayLabel(d) {
 const initial = s => (s || '').trim().slice(0, 1).toUpperCase();
 const mainOf = m => m.videos.find(v => v.kind === 'main') || m.videos.find(v => v.kind === 'full') || m.videos[0];
 const playAttr = m => { const v = mainOf(m); return v.kind === 'game' ? `data-play="${esc(m.id)}" data-game="1"` : `data-play="${esc(m.id)}" data-v="${v.id}"`; };
+function daysAgo(n) { const d = new Date(Date.now() - n * 864e5); return d.toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }
 function render() {
   document.querySelectorAll('.tab').forEach(t => {
     t.setAttribute('aria-selected', t.dataset.sport === sport);
-    t.querySelector('.n').textContent = data.filter(m => m.sport === t.dataset.sport).length || '';
+    t.querySelector('.n').textContent = data.filter(m => m.sport === t.dataset.sport && m.date >= daysAgo(RECENT_DAYS)).length || '';
   });
   const inSport = data.filter(m => m.sport === sport);
-  const leagues = ['전체', ...new Set(inSport.map(m => m.league).filter(Boolean))];
-  if (!leagues.includes(league)) league = '전체';
-  $('leagues').hidden = leagues.length <= 2;
-  $('leagues').innerHTML = leagues.map(l => `<button class="chip" aria-pressed="${l === league}" data-league="${esc(l)}">${esc(l)}</button>`).join('');
+  const dates = inSport.map(m => m.date).sort();
+  $('calInput').min = dates[0] || ''; $('calInput').max = todayKST();
+  $('calInput').value = pickDate || '';
+  $('calBtn').classList.toggle('on', !!pickDate);
+  $('calText').textContent = pickDate ? dayLabel(pickDate).code.slice(0, 5) : '날짜';
 
-  const list = inSport.filter(m => league === '전체' || m.league === league).sort((a, b) => b.date.localeCompare(a.date));
+  const pool = pickDate ? inSport.filter(m => m.date === pickDate) : inSport.filter(m => m.date >= daysAgo(RECENT_DAYS));
+  const leagues = ['전체', ...new Set(pool.map(m => m.league).filter(Boolean))];
+  if (!leagues.includes(league)) league = '전체';
+  $('leagues').innerHTML = leagues.length > 2 ? leagues.map(l => `<button class="chip" aria-pressed="${l === league}" data-league="${esc(l)}">${esc(l)}</button>`).join('') : '';
+
+  const list = pool.filter(m => league === '전체' || m.league === league).sort((a, b) => b.date.localeCompare(a.date));
+  const bar = pickDate ? `<div class="datebar">${dayLabel(pickDate).name === '오늘' || dayLabel(pickDate).name === '어제' ? dayLabel(pickDate).name + ' ' : ''}${Number(pickDate.slice(5, 7))}월 ${Number(pickDate.slice(8))}일 경기<button id="clearDate">최근 2주 보기</button></div>` : '';
   if (!list.length) {
-    $('main').innerHTML = `<div class="state"><b>아직 경기가 없어요</b>${SPORTS[sport].empty}</div>`;
+    $('main').innerHTML = bar + `<div class="state"><b>${pickDate ? '이 날은 경기가 없어요' : '아직 경기가 없어요'}</b>${pickDate ? '다른 날짜를 골라 보세요.' : SPORTS[sport].empty}</div>`;
     return;
   }
+  let hero = '';
+  let rest = list;
+  if (!pickDate) { const h = list.find(m => !m.videos.some(v => watched.has(v.id))) || list[0]; hero = heroHtml(h); rest = list.filter(m => m !== h); }
   const days = new Map();
-  list.forEach(m => days.set(m.date, [...(days.get(m.date) || []), m]));
-  $('main').innerHTML = [...days].map(([d, ms]) => {
+  rest.forEach(m => days.set(m.date, [...(days.get(m.date) || []), m]));
+  $('main').innerHTML = bar + hero + [...days].map(([d, ms]) => {
     const lab = dayLabel(d);
     return `<section><h2 class="day-head"><i class="bar"></i>${lab.name}<span>${lab.code}</span></h2><div class="grid">${ms.map(cardHtml).join('')}</div></section>`;
-  }).join('') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 1시간마다 자동 업데이트</p>`;
+  }).join('') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 1시간마다 자동 업데이트 · 2주 지난 경기는 달력으로</p>`;
+}
+const SEEN = m => m.videos.some(v => watched.has(v.id)) ? '<span class="seen">✓ 시청함</span>' : '';
+function extras(m, cls = 'sub') {
+  const full = m.videos.find(v => v.kind === 'full' && v !== mainOf(m));
+  const games = mainOf(m).kind !== 'game' && m.videos.some(v => v.kind === 'game' && v.n === 1);
+  return (full ? `<button class="${cls}" data-play="${esc(m.id)}" data-v="${full.id}">풀 하이라이트</button>` : '')
+    + (games ? `<button class="${cls}" data-play="${esc(m.id)}" data-game="1">게임별</button>` : '');
+}
+function heroHtml(m) {
+  const [a, b = ''] = m.teams.split(' vs ');
+  return `<article class="hero" style="--c:var(--${m.sport})">
+    <div class="vs">
+      <div class="side"><span class="crest">${esc(initial(a))}</span><span class="nm">${esc(a)}</span></div>
+      <div class="q">? : ?<small>결과 숨김</small></div>
+      <div class="side"><span class="crest b">${esc(initial(b))}</span><span class="nm">${esc(b)}</span></div>
+    </div>
+    <div class="row" style="flex-direction:column">
+      <div class="kicker"><b>NEW</b>${esc(EN[m.league] || m.league)} · ${dayLabel(m.date).code} ${SEEN(m)}</div>
+      <div class="row"><button class="watch" ${playAttr(m)}>${PLAY_ICON}하이라이트 보기</button>${extras(m)}</div>
+    </div>
+  </article>`;
 }
 function cardHtml(m) {
   const [a, b = ''] = m.teams.split(' vs ');
-  const full = m.videos.find(v => v.kind === 'full' && v !== mainOf(m));
-  const games = mainOf(m).kind !== 'game' && m.videos.some(v => v.kind === 'game' && v.n === 1);
-  const seen = m.videos.some(v => watched.has(v.id));
-  const lab = dayLabel(m.date);
-  const sub = full ? `<button class="sub" data-play="${esc(m.id)}" data-v="${full.id}">풀</button>`
-    : games ? `<button class="sub" data-play="${esc(m.id)}" data-game="1">게임별</button>` : '';
-  return `<article class="card${seen ? ' watched' : ''}" style="--c:var(--${m.sport})">
-    <div class="card-top"><span class="lg">${esc(EN[m.league] || m.league)}</span><span class="lockpill" title="결과 숨김">${LOCK_ICON}<span class="t">결과 숨김</span></span></div>
-    ${seen ? '<span class="seen">시청함</span>' : ''}
-    <div class="card-body">
-      <div class="team"><span class="crest">${esc(initial(a))}</span><span>${esc(a)}</span></div>
-      <div class="team"><span class="crest b">${esc(initial(b))}</span><span>${esc(b)}</span></div>
-    </div>
-    <div class="card-foot"><button class="watch" ${playAttr(m)} aria-label="${esc(m.teams)} 하이라이트 재생">${PLAY_ICON}하이라이트</button>${sub}</div>
-  </article>`;
+  const top = `<div class="card-top"><span class="lg">${esc(EN[m.league] || m.league)}</span>${SEEN(m) || `<span class="lockpill" title="결과 숨김">${LOCK_ICON}<span class="t">결과 숨김</span></span>`}</div>`;
+  const foot = `<div class="card-foot"><button class="watch" ${playAttr(m)} aria-label="${esc(m.teams)} 하이라이트 재생">${PLAY_ICON}${m.sport === 'ufc' ? '경기 보기' : '하이라이트'}</button>${extras(m).replace('>풀 하이라이트<', '>풀<')}</div>`;
+  let body;
+  let kind = '';
+  if (m.sport === 'baseball' || m.sport === 'basketball') {
+    kind = 'board';
+    body = `<div class="card-body"><div class="bt"><span class="crest">${esc(initial(a))}</span><span>${esc(a)}</span></div><span class="bq">? : ?</span><div class="bt"><span class="crest b">${esc(initial(b))}</span><span>${esc(b)}</span></div></div>`;
+  } else if (m.sport === 'lck') {
+    kind = 'esports';
+    const series = m.videos.some(v => v.kind === 'game') ? '시리즈 · 게임 수 숨김' : '경기 하이라이트';
+    body = `<div class="card-body"><div class="tagrow"><span class="ttag">${esc(a)}</span><span class="x">VS</span><span class="ttag">${esc(b)}</span></div><div class="series">${series}</div></div>`;
+  } else if (m.sport === 'ufc') {
+    kind = 'fight';
+    body = `<div class="card-body"><div class="corner"><small>RED</small><span>${esc(a)}</span></div><div class="vsx">VS</div><div class="corner blue"><small>BLUE</small><span>${esc(b)}</span></div></div>`;
+  } else {
+    body = `<div class="card-body"><div class="team"><span class="crest">${esc(initial(a))}</span><span>${esc(a)}</span></div><div class="team"><span class="crest b">${esc(initial(b))}</span><span>${esc(b)}</span></div></div>`;
+  }
+  return `<article class="card ${kind}" style="--c:var(--${m.sport})">${top}${body}${foot}</article>`;
 }
+
+$('calInput').addEventListener('change', e => { pickDate = e.target.value || null; league = '전체'; render(); window.scrollTo(0, 0); });
+$('home').addEventListener('click', () => { sport = 'soccer'; league = '전체'; pickDate = null; store.set('nospo.sport', sport); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
 document.addEventListener('click', e => {
   const tab = e.target.closest('.tab');
-  if (tab) { sport = tab.dataset.sport; league = '전체'; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
+  if (tab) { sport = tab.dataset.sport; league = '전체'; pickDate = null; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
+  if (e.target.id === 'clearDate') { pickDate = null; render(); return; }
   const chip = e.target.closest('.chip');
   if (chip) { league = chip.dataset.league; render(); return; }
   const p = e.target.closest('[data-play]');
@@ -278,7 +371,12 @@ document.addEventListener('click', e => {
 let yt = null, ytReady = false, current = null;
 window.onYouTubeIframeAPIReady = () => { ytReady = true; };
 (() => { const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s); })();
-const VARS = { autoplay: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1, fs: 0, cc_load_policy: 0, hl: 'ko' };
+const IOS = /iP(hone|od)/.test(navigator.userAgent);
+// 아이폰은 사이트 쪽 전체화면이 안 돼서 유튜브 기본 전체화면 버튼을 켬 (폰을 돌리면 가로로 꽉 참)
+const VARS = { autoplay: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1, fs: IOS ? 1 : 0, cc_load_policy: 0, hl: 'ko' };
+// 유튜브 제목은 재생 시작 직후에만 뜨므로 처음 몇 초만 가림 (영상 속 점수판은 가리지 않음)
+let coverTimer = null;
+function flashCover(ms = 4500) { $('coverTop').classList.add('on'); clearTimeout(coverTimer); coverTimer = setTimeout(() => $('coverTop').classList.remove('on'), ms); }
 let ccOn = false;
 function setCC(on) {
   ccOn = on;
@@ -290,6 +388,7 @@ function setCC(on) {
 function shield(html) { $('shield').innerHTML = html; $('shield').classList.toggle('on', !!html); }
 function mountVideo(id) {
   shield('');
+  flashCover(6000);
   if (yt?.loadVideoById) { yt.loadVideoById(id); return; }
   const el = $('yt');
   if (el.tagName === 'IFRAME') { el.src = `https://www.youtube-nocookie.com/embed/${id}?${new URLSearchParams(VARS)}`; return; }
@@ -318,6 +417,7 @@ function onState(e) {
     else $('goClose').onclick = closePlayer;
   } else if (e.data === S.PLAYING) {
     shield('');
+    flashCover(3000);
     if (!ccOn) setCC(false);
   }
 }
@@ -327,7 +427,7 @@ function show(m, title) {
   $('pTitle').textContent = title;
   $('player').classList.add('on');
   document.body.style.overflow = 'hidden';
-  $('pFull').hidden = !$('frame').requestFullscreen;
+  $('pFull').hidden = IOS || !$('frame').requestFullscreen;
 }
 function openVideo(m, v) {
   if (!v) return;
@@ -369,7 +469,12 @@ function closePlayer() {
 }
 $('pClose').onclick = closePlayer;
 $('pCC').onclick = () => setCC(!ccOn);
-$('pFull').onclick = () => document.fullscreenElement ? document.exitFullscreen() : $('frame').requestFullscreen();
+$('pFull').onclick = async () => {
+  if (document.fullscreenElement) { try { screen.orientation?.unlock?.(); } catch {} return document.exitFullscreen(); }
+  try { await $('frame').requestFullscreen({ navigationUI: 'hide' }); } catch { return; }
+  try { await screen.orientation?.lock?.('landscape'); } catch {}   // 안드로이드: 자동으로 가로 회전
+};
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) { try { screen.orientation?.unlock?.(); } catch {} } });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('player').classList.contains('on') && !document.fullscreenElement) closePlayer(); });
 
 load();
