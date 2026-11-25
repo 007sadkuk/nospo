@@ -38,7 +38,7 @@ function lockups(data) {
       if (t) out.push({ id: v.contentId, title: t, ago: rows });
     }
     if (k === 'playlistVideoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '' });
-    if (k === 'videoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '' });
+    if (k === 'videoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '', ago: v.publishedTimeText?.simpleText || '' });
     return v;
   });
   return out;
@@ -60,7 +60,10 @@ async function channelId(handle) {
 async function collect(src) {
   const items = new Map();
   const add = list => list.forEach(x => { if (!items.has(x.id) || x.date) items.set(x.id, { ...items.get(x.id), ...x }); });
-  if (src.playlist) {
+  if (src.search) {
+    // 채널 안 검색 결과 (최신 목록에서 밀려난 경기도 찾을 수 있음)
+    add(lockups(initialData(await get(`https://www.youtube.com/${src.handle}/search?query=${encodeURIComponent(src.search)}`))).slice(0, PAGE_ITEMS));
+  } else if (src.playlist) {
     add(lockups(initialData(await get('https://www.youtube.com/playlist?list=' + src.playlist))).slice(0, PAGE_ITEMS));
     add(await rss('playlist_id=' + src.playlist));
   } else {
@@ -93,7 +96,7 @@ function titleDate(title, ref) {
 // ── 제목 해석 (점수·결과는 절대 저장하지 않음) ─────────────
 const VS = /\s(?:vs\.?|VS|Vs|v)\s/;
 function parseTeams(title) {
-  const outside = title.replace(/\[[^\]]*\]|【[^】]*】|\([^)]*\)/g, ' ').split(/[|｜/·]|\sI\s/);
+  const outside = title.replace(/\[[^\]]*\]|【[^】]*】|\([^)]*\)/g, ' ').split(/[|｜/·]|\s[Il]\s/);
   const inside = (title.match(/\[[^\]]*\]|【[^】]*】/g) || []).map(x => x.slice(1, -1));
   const seg = outside.find(p => VS.test(p)) || inside.find(p => VS.test(p));
   if (!seg) return null;
@@ -106,7 +109,7 @@ function parseTeams(title) {
     .replace(/(^|\s)\d+라운드(?=\s|$)/g, ' ')
     .replace(/(^|\s)게임\s*\d+/g, ' ')
     .replace(/\d+\s*분/g, ' ')
-    .replace(/하이라이트|HIGHLIGHTS?|Highlights?|H\/L|풀영상|FULL|매치|경기/gi, ' ')
+    .replace(/하이라이트|HIGHLIGHTS?|Highlights?|H\/L|풀영상|FULL|매치|경기|요약/gi, ' ')
     .replace(/(^|\s)(풀|전체|주요)(?=\s|$)/g, ' ')
     .replace(/[^\p{L}\p{N}\s.&']/gu, ' ')
     .replace(/\s+/g, ' ').trim();
@@ -146,7 +149,7 @@ const dateCache = old.v === VERSION ? old.dates || {} : {};
 const found = [];   // {id,title,date?,sport,league}
 
 for (const src of sources) {
-  const name = src.playlist ? `재생목록 ${src.league}` : src.handle;
+  const name = src.search ? `${src.handle} 검색 '${src.search}'` : src.playlist ? `재생목록 ${src.league}` : src.handle;
   try {
     const list = await collect(src);
     let n = 0;
