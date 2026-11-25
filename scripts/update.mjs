@@ -166,6 +166,7 @@ for (const src of sources) {
       n++;
     }
     console.log(`✅ ${name}: 영상 ${list.length}개 중 경기 영상 ${n}개`);
+    if (src.search) console.log('   예시:', list.slice(0, 3).map(x => `${x.title.slice(0, 25)} [${x.ago || x.date || '날짜없음'}]`).join(' / '));
   } catch (e) {
     console.log(`❌ ${name}: ${e.message}`);
   }
