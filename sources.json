@@ -109,6 +109,50 @@
   ]
  },
  {
+  "sport": "basketball",
+  "league": "KBL",
+  "playlist": "PLMxFa0kMKEiA",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "basketball",
+  "league": "KBL",
+  "handle": "@tvingsports",
+  "must": [
+   "프로농구"
+  ]
+ },
+ {
+  "sport": "basketball",
+  "league": "WKBL",
+  "playlist": "PLQsCB7C0H6p0",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "basketball",
+  "league": "NBA",
+  "playlist": "PLWTZYHe9YKAL3MGsPyiySRRP-PEsIJdEu",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "basketball",
+  "league": "NBA",
+  "handle": "@CoupangPlaySports",
+  "must": [
+   "하이라이트"
+  ],
+  "leagueFromBracket": true,
+  "bracketAllow": [
+   "NBA"
+  ]
+ },
+ {
   "sport": "lck",
   "league": "LCK",
   "playlist": "PLIWtfvmBcNocpzEpM2WLn-Unptgj4qTD3"
