@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const VERSION = 4;
-const KEEP_DAYS = 60;          // 이 기간 안의 경기만 보관
+const KEEP_DAYS = 90;          // 이 기간 안의 경기만 보관 (사이트는 최근 2주를 기본으로 보여주고, 이전 경기는 달력으로 찾음)
 const MAX_DATE_LOOKUPS = 150;  // 한 번 실행에 영상 페이지로 날짜 조회할 최대 수
 const PAGE_ITEMS = 40;         // 재생목록/채널 페이지에서 최신 몇 개까지 볼지
 
@@ -210,6 +210,16 @@ for (const f of found.sort((x, y) => (dateCache[y.id] || '').localeCompare(dateC
   if (m.videos.some(v => v.kind === f.kind && v.n === f.n)) continue;
   m.videos.push({ id: f.id, kind: f.kind, label: f.label, ...(f.n ? { n: f.n } : {}) });
 }
+// 이번에 목록에서 안 보인 예전 경기도 그대로 보관 (채널 목록은 최신 영상만 보여주기 때문)
+if (old.v === VERSION) {
+  for (const m of old.matches || []) {
+    if (m.manual || !m.date || m.date < cutoff) continue;
+    if ((m.videos || []).some(v => seen.has(v.id))) continue;
+    if (!sources.some(src => src.sport === m.sport)) continue;
+    matches.push(m);
+    (m.videos || []).forEach(v => seen.add(v.id));
+  }
+}
 for (const m of matches) {
   const order = { main: 0, full: 1, game: 2 };
   m.videos.sort((a, b) => order[a.kind] - order[b.kind] || (a.n || 0) - (b.n || 0));
@@ -223,4 +233,4 @@ const keepDates = {};
 for (const m of all) for (const v of m.videos || []) if (dateCache[v.id]) keepDates[v.id] = dateCache[v.id];
 writeFileSync('data.json', JSON.stringify({ v: VERSION, updated: new Date().toISOString(), matches: all, dates: keepDates }));
 const count = s => all.filter(m => m.sport === s).length;
-console.log(`저장: 축구 ${count('soccer')} · 야구 ${count('baseball')} · LCK ${count('lck')} · UFC ${count('ufc')}`);
+console.log(`저장: 축구 ${count('soccer')} · 야구 ${count('baseball')} · 농구 ${count('basketball')} · LCK ${count('lck')} · UFC ${count('ufc')}`);
