@@ -125,7 +125,8 @@ function parseTeams(title) {
 function videoKind(title) {
   const g = title.match(/게임\s*(\d+)/);
   if (g) return { kind: 'game', n: Number(g[1]), label: `게임 ${g[1]}` };
-  if (/풀\s*하이라이트|풀영상|Full VOD/i.test(title)) return { kind: 'full', label: '풀 하이라이트' };
+  if (/Full VOD|풀영상|풀경기|풀 경기|전체 경기/i.test(title)) return { kind: 'vod', label: '풀영상' };
+  if (/풀\s*하이라이트/i.test(title)) return { kind: 'full', label: '풀 하이라이트' };
   return { kind: 'main', label: '하이라이트' };
 }
 const SKIP = /주요장면|모음|클러치|인터뷰|TOP\s?\d|예고|프리뷰|리뷰|#shorts|쇼츠|현지해설|이슈/i;
@@ -133,6 +134,7 @@ const SKIP = /주요장면|모음|클러치|인터뷰|TOP\s?\d|예고|프리뷰|
 function accept(src, title) {
   if (SKIP.test(title)) return null;
   if (src.must && !src.must.some(k => title.includes(k))) return null;
+  if (src.kind === 'vod' && /분석|시크릿|토크|프리뷰/.test(title)) return null;
   if (src.exclude && new RegExp(src.exclude, 'i').test(title)) return null;
   let league = src.league;
   if (src.leagueFromBracket) {
@@ -164,7 +166,8 @@ for (const src of sources) {
       const t = parseTeams(it.title);
       if (!t) continue;
       if (src.sport === 'baseball' && !(KBO_TEAMS.some(k => t.a.includes(k)) && KBO_TEAMS.some(k => t.b.includes(k)))) continue;
-      found.push({ ...it, ...t, sport: src.sport, league, ...videoKind(it.title) });
+      const vk = src.kind === 'vod' ? { kind: 'vod', label: '풀영상' } : videoKind(it.title);
+      found.push({ ...it, ...t, sport: src.sport, league, ...vk });
       n++;
     }
     console.log(`✅ ${name}: 영상 ${list.length}개 중 경기 영상 ${n}개`);
@@ -230,7 +233,7 @@ if (old.v === VERSION) {
   }
 }
 for (const m of matches) {
-  const order = { main: 0, full: 1, game: 2 };
+  const order = { main: 0, full: 1, vod: 2, game: 3 };
   m.videos.sort((a, b) => order[a.kind] - order[b.kind] || (a.n || 0) - (b.n || 0));
 }
 
