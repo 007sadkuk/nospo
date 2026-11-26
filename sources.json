@@ -79,7 +79,7 @@
  {
   "sport": "soccer",
   "handle": "@CoupangPlaySports",
-  "search": "프리미어리그 2분 하이라이트",
+  "search": "쿠팡플레이 프리미어리그 2분 하이라이트",
   "must": [
    "하이라이트"
   ],
@@ -95,7 +95,7 @@
  {
   "sport": "soccer",
   "handle": "@CoupangPlaySports",
-  "search": "라리가 2분 하이라이트",
+  "search": "쿠팡플레이 라리가 2분 하이라이트",
   "must": [
    "하이라이트"
   ],
@@ -111,7 +111,7 @@
  {
   "sport": "soccer",
   "handle": "@CoupangPlaySports",
-  "search": "분데스리가 2분 하이라이트",
+  "search": "쿠팡플레이 분데스리가 2분 하이라이트",
   "must": [
    "하이라이트"
   ],
@@ -127,7 +127,7 @@
  {
   "sport": "soccer",
   "handle": "@CoupangPlaySports",
-  "search": "K리그1 하이라이트",
+  "search": "쿠팡플레이 K리그1 2분 하이라이트",
   "must": [
    "하이라이트"
   ],
@@ -143,7 +143,7 @@
  {
   "sport": "soccer",
   "handle": "@CoupangPlaySports",
-  "search": "K리그2 하이라이트",
+  "search": "쿠팡플레이 K리그2 2분 하이라이트",
   "must": [
    "하이라이트"
   ],
@@ -260,7 +260,7 @@
   "sport": "basketball",
   "league": "NBA",
   "handle": "@CoupangPlaySports",
-  "search": "NBA 1분 요약",
+  "search": "NBA 1분 요약 쿠팡플레이",
   "must": [
    "요약 l NBA"
   ]
@@ -269,7 +269,7 @@
   "sport": "ufc",
   "league": "UFC",
   "handle": "@tvNSPORTS",
-  "search": "UFC",
+  "search": "tvN SPORTS [UFC]",
   "must": [
    "[UFC"
   ]
