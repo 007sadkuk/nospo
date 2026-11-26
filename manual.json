@@ -1,1 +1,77 @@
-[]
+[
+ {
+  "id": "zxCkezdIVkI",
+  "sport": "ufc",
+  "league": "UFC",
+  "teams": "유리 프로하스카 vs 나바호 스털링",
+  "date": "2026-11-21",
+  "status": "end",
+  "videos": [
+   {
+    "id": "zxCkezdIVkI",
+    "kind": "main",
+    "label": "하이라이트"
+   }
+  ]
+ },
+ {
+  "id": "JH4qolTmLPo",
+  "sport": "ufc",
+  "league": "UFC",
+  "teams": "알저메인 스털링 vs 케빈 바셰호스",
+  "date": "2026-11-21",
+  "status": "end",
+  "videos": [
+   {
+    "id": "JH4qolTmLPo",
+    "kind": "main",
+    "label": "하이라이트"
+   }
+  ]
+ },
+ {
+  "id": "oFUre15svhg",
+  "sport": "ufc",
+  "league": "UFC",
+  "teams": "댄 후커 vs 브라이언 오르테가",
+  "date": "2026-11-21",
+  "status": "end",
+  "videos": [
+   {
+    "id": "oFUre15svhg",
+    "kind": "main",
+    "label": "하이라이트"
+   }
+  ]
+ },
+ {
+  "id": "5_X9qQ7TK2U",
+  "sport": "ufc",
+  "league": "UFC",
+  "teams": "호리구치 쿄지 vs 아수 알마바예프",
+  "date": "2026-11-21",
+  "status": "end",
+  "videos": [
+   {
+    "id": "5_X9qQ7TK2U",
+    "kind": "main",
+    "label": "하이라이트"
+   }
+  ]
+ },
+ {
+  "id": "LxRNc-JBJAk",
+  "sport": "ufc",
+  "league": "UFC",
+  "teams": "재러드 캐노니어 vs 이크람 알리스케로프",
+  "date": "2026-11-21",
+  "status": "end",
+  "videos": [
+   {
+    "id": "LxRNc-JBJAk",
+    "kind": "main",
+    "label": "하이라이트"
+   }
+  ]
+ }
+]
