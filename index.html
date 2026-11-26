@@ -137,7 +137,12 @@ main { padding-block: 20px 64px; display: flex; flex-direction: column; gap: 36p
 /* 플레이어 */
 .player { position: fixed; inset: 0; z-index: 50; background: #000; display: none; flex-direction: column; }
 .player.on { display: flex; }
-.p-bar { display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; }
+.p-bar { display: flex; align-items: center; gap: 6px; padding: calc(8px + env(safe-area-inset-top, 0px)) 10px 6px; }
+.p-ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+.p-ico svg { width: 22px; height: 22px; }
+.p-ctrl { display: flex; gap: 6px; padding: 0 12px 10px; overflow-x: auto; scrollbar-width: none; }
+.p-ctrl::-webkit-scrollbar { display: none; }
+.p-ctrl .p-btn { flex-shrink: 0; }
 .p-title { flex: 1; min-width: 0; }
 .p-title .l { font-size: 12px; font-weight: 600; color: var(--t3); }
 .p-title .t { font-weight: 800; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -189,10 +194,16 @@ main { padding-block: 20px 64px; display: flex; flex-direction: column; gap: 36p
 
 <div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="pTitle">
   <div class="p-bar">
+    <button class="p-ico" id="pClose" aria-label="목록으로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
     <div class="p-title"><div class="l" id="pLeague"></div><div class="t" id="pTitle"></div></div>
+  </div>
+  <div class="p-ctrl" id="pCtrl">
+    <button class="p-btn" data-ctl="back10" aria-label="10초 뒤로">−10초</button>
+    <button class="p-btn" data-ctl="fwd10" aria-label="10초 앞으로">+10초</button>
+    <button class="p-btn" data-ctl="rate" id="pRate">1배속</button>
+    <button class="p-btn" data-ctl="mute" id="pMute">소리 끄기</button>
     <button class="p-btn" id="pCC">자막 켜기</button>
     <button class="p-btn" id="pFull" hidden>전체화면</button>
-    <button class="p-btn" id="pClose">닫기</button>
   </div>
   <div class="stage">
     <div class="frame" id="frame">
@@ -271,7 +282,7 @@ function dayLabel(d) {
   return { name, code };
 }
 const initial = s => (s || '').trim().slice(0, 1).toUpperCase();
-const mainOf = m => m.videos.find(v => v.kind === 'main') || m.videos.find(v => v.kind === 'full') || m.videos[0];
+const mainOf = m => m.videos.find(v => v.kind === 'main') || m.videos.find(v => v.kind === 'full') || m.videos.find(v => v.kind === 'game' && v.n === 1) || m.videos[0];
 const playAttr = m => { const v = mainOf(m); return v.kind === 'game' ? `data-play="${esc(m.id)}" data-game="1"` : `data-play="${esc(m.id)}" data-v="${v.id}"`; };
 
 // ── 팀 컬러 배지 (로고 대신 팀 고유색 + 약자) ──
@@ -338,7 +349,9 @@ const SEEN = m => m.videos.some(v => watched.has(v.id)) ? '<span class="seen">�
 function extras(m, cls = 'sub') {
   const full = m.videos.find(v => v.kind === 'full' && v !== mainOf(m));
   const games = mainOf(m).kind !== 'game' && m.videos.some(v => v.kind === 'game' && v.n === 1);
+  const vod = m.videos.find(v => v.kind === 'vod' && v !== mainOf(m));
   return (full ? `<button class="${cls}" data-play="${esc(m.id)}" data-v="${full.id}">풀 하이라이트</button>` : '')
+    + (vod ? `<button class="${cls}" data-play="${esc(m.id)}" data-v="${vod.id}">풀영상</button>` : '')
     + (games ? `<button class="${cls}" data-play="${esc(m.id)}" data-game="1">게임별</button>` : '');
 }
 const LOCK_SM = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';
@@ -356,7 +369,7 @@ function heroHtml(m) {
         </div>
       </div>
       <div class="cta">
-        <button class="btn primary" ${playAttr(m)}>${PLAY_ICON}${m.sport === 'ufc' ? '경기 보기' : '하이라이트 보기'}</button>
+        <button class="btn primary" ${playAttr(m)}>${PLAY_ICON}${mainOf(m).kind === 'vod' ? '풀영상 보기' : m.sport === 'ufc' ? '경기 보기' : '하이라이트 보기'}</button>
         ${extras(m, 'btn ghost')}
       </div>
     </div>
@@ -457,12 +470,15 @@ function onState(e) {
   }
 }
 function markWatched(id) { watched.add(id); store.set('nospo.watched', [...watched].slice(-500)); }
+let pushed = false;
 function show(m, title) {
+  if (!pushed) { history.pushState({ nospoPlayer: 1 }, ''); pushed = true; }   // 휴대폰 뒤로가기 = 목록으로
   $('pLeague').textContent = m.league || SPORTS[m.sport].name;
   $('pTitle').textContent = title;
   $('player').classList.add('on');
   document.body.style.overflow = 'hidden';
   $('pFull').hidden = IOS || !$('frame').requestFullscreen;
+  $('pRate').textContent = '1배속';
 }
 function openVideo(m, v) {
   if (!v) return;
@@ -493,7 +509,9 @@ function openGame(m, n) {
   };
   mountVideo(v.id); markWatched(v.id);
 }
-function closePlayer() {
+function closePlayer(fromHistory) {
+  if (pushed && fromHistory !== true) { pushed = false; history.back(); return; }   // popstate에서 다시 닫힘
+  pushed = false;
   $('player').classList.remove('on');
   document.body.style.overflow = '';
   if (yt?.stopVideo) yt.stopVideo();
@@ -502,7 +520,18 @@ function closePlayer() {
   shield('');
   render();
 }
-$('pClose').onclick = closePlayer;
+$('pClose').onclick = () => closePlayer();
+addEventListener('popstate', () => { if ($('player').classList.contains('on')) closePlayer(true); });
+// 재생 조작 버튼 (화면을 안 눌러도 되게)
+const RATES = [1, 1.25, 1.5, 2, 0.75];
+$('pCtrl').addEventListener('click', e => {
+  const c = e.target.closest('[data-ctl]')?.dataset.ctl;
+  if (!c || !yt?.getCurrentTime) return;
+  if (c === 'back10') yt.seekTo(Math.max(0, yt.getCurrentTime() - 10), true);
+  if (c === 'fwd10') yt.seekTo(yt.getCurrentTime() + 10, true);
+  if (c === 'rate') { const r = RATES[(RATES.indexOf(yt.getPlaybackRate()) + 1) % RATES.length]; yt.setPlaybackRate(r); $('pRate').textContent = r + '배속'; }
+  if (c === 'mute') { if (yt.isMuted()) { yt.unMute(); $('pMute').textContent = '소리 끄기'; } else { yt.mute(); $('pMute').textContent = '소리 켜기'; } }
+});
 $('pCC').onclick = () => setCC(!ccOn);
 $('pFull').onclick = async () => {
   if (document.fullscreenElement) { try { screen.orientation?.unlock?.(); } catch {} return document.exitFullscreen(); }
