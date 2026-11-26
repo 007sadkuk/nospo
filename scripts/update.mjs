@@ -38,7 +38,7 @@ function lockups(data) {
       if (t) out.push({ id: v.contentId, title: t, ago: rows });
     }
     if (k === 'playlistVideoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '' });
-    if (k === 'videoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '', ago: v.publishedTimeText?.simpleText || '' });
+    if (k === 'videoRenderer' && v?.videoId) out.push({ id: v.videoId, title: v.title?.runs?.[0]?.text || '', ago: v.publishedTimeText?.simpleText || '', owner: v.ownerText?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl || '' });
     return v;
   });
   return out;
@@ -62,7 +62,9 @@ async function collect(src) {
   const add = list => list.forEach(x => { if (!items.has(x.id) || x.date) items.set(x.id, { ...items.get(x.id), ...x }); });
   if (src.search) {
     // 채널 안 검색 결과 (최신 목록에서 밀려난 경기도 찾을 수 있음)
-    add(lockups(initialData(await get(`https://www.youtube.com/${src.handle}/search?query=${encodeURIComponent(src.search)}&hl=ko&gl=KR`))).slice(0, PAGE_ITEMS));
+    // 유튜브 전체 검색을 '최신 업로드순'으로 돌린 뒤, 그 채널 영상만 남김
+    const q = `https://www.youtube.com/results?search_query=${encodeURIComponent(src.search)}&sp=CAISAhAB&hl=ko&gl=KR`;
+    add(lockups(initialData(await get(q))).filter(x => !x.owner || x.owner.toLowerCase() === '/' + src.handle.toLowerCase()).slice(0, PAGE_ITEMS));
   } else if (src.playlist) {
     add(lockups(initialData(await get('https://www.youtube.com/playlist?list=' + src.playlist))).slice(0, PAGE_ITEMS));
     add(await rss('playlist_id=' + src.playlist));
@@ -200,7 +202,7 @@ console.log(`날짜 조회 ${need.length}개 · 대략 날짜 ${fallback}개`);
 // 같은 경기(같은 종목·팀, 날짜 하루 이내)의 영상들을 한 카드로 묶음
 const cutoff = new Date(Date.now() - KEEP_DAYS * 864e5).toISOString().slice(0, 10);
 const matches = [];
-const seen = new Set();
+const seen = new Set(readJson('manual.json', []).flatMap(m => (m.videos || []).map(v => v.id)));   // 직접 넣은 경기와 겹치지 않게
 for (const f of found.sort((x, y) => (dateCache[y.id] || '').localeCompare(dateCache[x.id] || ''))) {
   const date = dateCache[f.id];
   if (!date || date < cutoff || seen.has(f.id)) continue;
