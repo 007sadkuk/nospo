@@ -127,6 +127,10 @@ main { padding-block: 20px 64px; display: flex; flex-direction: column; gap: 36p
 .skel::after { content: ''; display: block; margin: 18px 16px; height: 12px; width: 45%; border-radius: 6px; background: var(--s3); box-shadow: 0 20px 0 0 var(--s3); }
 @media (prefers-reduced-motion: no-preference) { .skel::after { animation: pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { opacity: .5; } } }
 .foot { text-align: center; color: var(--t3); font-size: 12px; }
+.range { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 14px; background: var(--s1); font-size: 14px; color: var(--t2); margin-bottom: -12px; }
+.range b { color: var(--text); font-weight: 800; }
+.range .sub { font-size: 13px; color: var(--t3); }
+.range button { color: var(--text); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .moreall { align-self: center; height: 46px; padding: 0 22px; border-radius: 999px; background: var(--s2); color: var(--text); font-size: 15px; font-weight: 700; }
 .moreall span { color: var(--t3); font-weight: 600; margin-left: 4px; }
 
@@ -323,7 +327,9 @@ function render() {
   if (!pickDate) { const h = list.find(m => !m.videos.some(v => watched.has(v.id))) || list[0]; hero = heroHtml(h); rest = list.filter(m => m !== h); }
   const days = new Map();
   rest.forEach(m => days.set(m.date, [...(days.get(m.date) || []), m]));
-  $('main').innerHTML = bar + hero + [...days].map(([d, ms]) => {
+  const md = s => `${Number(s.slice(5, 7))}월 ${Number(s.slice(8))}일`;
+  const range = pickDate ? '' : `<div class="range"><div><b>${md(daysAgo(span))} ~ ${md(todayKST())}</b> 경기를 보고 있어요</div><div class="sub">그 전 경기는 <button id="rangeCal">날짜</button>를 눌러 찾아보세요</div></div>`;
+  $('main').innerHTML = range + bar + hero + [...days].map(([d, ms]) => {
     const lab = dayLabel(d);
     return `<section><h2 class="sec-h"><b>${lab.name}</b><span>${lab.name.includes('월') ? lab.code.slice(6) : lab.code}</span></h2><div class="list">${ms.map(rowHtml).join('')}</div></section>`;
   }).join('') + (older ? `<button class="moreall" id="moreOld">이전 경기 더 보기 <span>${older}</span></button>` : '') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 1시간마다 업데이트</p>`;
@@ -384,6 +390,7 @@ document.addEventListener('click', e => {
   if (tab) { sport = tab.dataset.sport; league = '전체'; pickDate = null; span = RECENT_DAYS; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
   if (e.target.id === 'clearDate') { pickDate = null; render(); return; }
   if (e.target.closest('#moreOld')) { span += RECENT_DAYS; render(); return; }
+  if (e.target.id === 'rangeCal') { const inp = $('calInput'); try { inp.showPicker(); } catch { inp.focus(); inp.click(); } return; }
   const chip = e.target.closest('.chip');
   if (chip) { league = chip.dataset.league; render(); return; }
   const p = e.target.closest('[data-play]');
