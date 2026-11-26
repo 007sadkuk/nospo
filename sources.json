@@ -157,6 +157,86 @@
   ]
  },
  {
+  "sport": "soccer",
+  "league": "프리미어리그",
+  "playlist": "PLWTZYHe9YKAJRAqsz0SG1ePnBd63wDtrE",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "라리가",
+  "playlist": "PLWTZYHe9YKAI8qcMEapM8GNSD0j8GW0GV",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "분데스리가",
+  "playlist": "PLWTZYHe9YKAK06oHvlkC3BQ-vWiw1m8sC",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "K리그1",
+  "playlist": "PLWTZYHe9YKAKlowFKOlQDtcrfE-ldfMVq",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "K리그2",
+  "playlist": "PLWTZYHe9YKAKfTUUWpVdBYX8QOChEbsO7",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "MLS",
+  "playlist": "PLWTZYHe9YKAL0FmXI9JVg-L3vubj-jCYY",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "리그1",
+  "playlist": "PLWTZYHe9YKALvwJQMv35z8zjsIw5ghLOV",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "FA컵",
+  "playlist": "PLWTZYHe9YKAKvdjVeHSIGjxM-UbEGQ5dT",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "카라바오컵",
+  "playlist": "PLWTZYHe9YKALNFIgC6qezt2kJJj4bhUyd",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
+  "sport": "soccer",
+  "league": "EFL 챔피언십",
+  "playlist": "PLWTZYHe9YKAIfsuqKDslk_0E5CAG-27SH",
+  "must": [
+   "하이라이트"
+  ]
+ },
+ {
   "sport": "baseball",
   "league": "KBO",
   "playlist": "PLQSdHthiYH--pEoRrL9NEQqwzFQTz1TSw",
