@@ -53,7 +53,8 @@ button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .tools { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; }
 .cal { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; font-weight: 700; color: var(--text); }
 .cal svg { width: 14px; height: 14px; }
-.cal input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.cal { cursor: pointer; }
+.cal input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; font-size: 16px; }
 .cal.on { background: var(--red); border-color: var(--red); color: #fff; }
 .leagues { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 1; }
 .datebar { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); font-weight: 700; }
@@ -258,7 +259,7 @@ async function load() {
 
 // ── 목록 화면 ──
 const LOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
-const EN = { '프리미어리그': 'Premier League', '라리가': 'LaLiga', '분데스리가': 'Bundesliga', '세리에A': 'Serie A', '챔피언스리그': 'Champions League', '유로파리그': 'Europa League', '컨퍼런스리그': 'Conference League', '네이션스리그': 'Nations League', '스코틀랜드 리그': 'Scottish Premiership', 'K리그1': 'K League 1', 'K리그2': 'K League 2', 'MLS': 'MLS', 'KBO': 'KBO League', 'KBO 포스트시즌': 'KBO Postseason', 'KBO 한국시리즈': 'Korean Series', 'KBL': 'KBL', 'WKBL': 'WKBL', 'NBA': 'NBA', 'LCK': 'LCK', '월드 챔피언십': 'Worlds', 'UFC': 'UFC' };
+const EN = { '프리미어리그': 'Premier League', '라리가': 'LaLiga', '분데스리가': 'Bundesliga', '세리에A': 'Serie A', '챔피언스리그': 'Champions League', '유로파리그': 'Europa League', '컨퍼런스리그': 'Conference League', '네이션스리그': 'Nations League', '스코틀랜드 리그': 'Scottish Premiership', 'K리그1': 'K League 1', 'K리그2': 'K League 2', 'MLS': 'MLS', 'KBO': 'KBO League', 'KBO 포스트시즌': 'KBO Postseason', 'KBO 한국시리즈': 'Korean Series', '리그1': 'Ligue 1', 'FA컵': 'FA Cup', '카라바오컵': 'Carabao Cup', 'EFL 챔피언십': 'EFL Championship', 'UEFA 유스리그': 'UEFA Youth League', 'KBL': 'KBL', 'WKBL': 'WKBL', 'NBA': 'NBA', 'LCK': 'LCK', '월드 챔피언십': 'Worlds', 'UFC': 'UFC' };
 const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 function dayLabel(d) {
   const utc = s => { const [y, m, dd] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, dd)); };
@@ -350,6 +351,12 @@ function cardHtml(m) {
 }
 
 $('calInput').addEventListener('change', e => { pickDate = e.target.value || null; league = '전체'; render(); window.scrollTo(0, 0); });
+// 날짜 버튼을 누르면 달력을 바로 띄움 (PC 크롬은 투명 입력칸만으로는 달력이 안 열림)
+$('calBtn').addEventListener('click', e => {
+  const inp = $('calInput');
+  if (typeof inp.showPicker === 'function') { e.preventDefault(); try { inp.showPicker(); return; } catch {} }
+  inp.focus(); inp.click();
+});
 $('home').addEventListener('click', () => { sport = 'soccer'; league = '전체'; pickDate = null; store.set('nospo.sport', sport); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
 document.addEventListener('click', e => {
