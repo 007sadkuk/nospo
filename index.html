@@ -44,14 +44,14 @@ button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; bord
 .tab .n { font-size: 12px; font-weight: 600; margin-left: 3px; color: var(--t3); }
 .tab[aria-selected="true"] { color: var(--text); }
 .tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: var(--text); }
-.tools { display: flex; align-items: center; gap: 8px; padding: 12px 0; }
+.tools { display: flex; align-items: flex-start; gap: 8px; padding: 12px 0; }
 .cal { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--s2); font-size: 13px; font-weight: 600; color: var(--t2); cursor: pointer; }
 .cal svg { width: 14px; height: 14px; }
 .cal input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; font-size: 16px; }
 .cal.on { background: var(--text); color: var(--bg); }
-.leagues { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 1; }
+.leagues { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; flex: 1; }   /* 리그가 많아도 잘리지 않게 줄바꿈 */
 .leagues::-webkit-scrollbar { display: none; }
-.chip { flex-shrink: 0; height: 32px; padding: 0 13px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--t2); border: 1px solid var(--hair); }
+.chip { flex-shrink: 0; height: 32px; padding: 0 13px; white-space: nowrap; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--t2); border: 1px solid var(--hair); }
 .chip[aria-pressed="true"] { background: var(--s3); color: var(--text); border-color: transparent; }
 
 /* 본문 */
