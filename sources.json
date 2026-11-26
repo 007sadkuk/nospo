@@ -329,6 +329,12 @@
   ]
  },
  {
+  "sport": "lck",
+  "league": "월드 챔피언십",
+  "playlist": "PLOnRKWJZVZ5M",
+  "kind": "vod"
+ },
+ {
   "sport": "ufc",
   "league": "UFC",
   "handle": "@tvNSPORTS",
