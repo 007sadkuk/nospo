@@ -127,6 +127,8 @@ main { padding-block: 20px 64px; display: flex; flex-direction: column; gap: 36p
 .skel::after { content: ''; display: block; margin: 18px 16px; height: 12px; width: 45%; border-radius: 6px; background: var(--s3); box-shadow: 0 20px 0 0 var(--s3); }
 @media (prefers-reduced-motion: no-preference) { .skel::after { animation: pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { opacity: .5; } } }
 .foot { text-align: center; color: var(--t3); font-size: 12px; }
+.moreall { align-self: center; height: 46px; padding: 0 22px; border-radius: 999px; background: var(--s2); color: var(--text); font-size: 15px; font-weight: 700; }
+.moreall span { color: var(--t3); font-weight: 600; margin-left: 4px; }
 
 /* 플레이어 */
 .player { position: fixed; inset: 0; z-index: 50; background: #000; display: none; flex-direction: column; }
@@ -220,6 +222,7 @@ if (!SPORTS[sport]) sport = 'soccer';
 let league = '전체';
 let pickDate = null;   // 달력에서 고른 날짜 (없으면 최근 2주)
 const RECENT_DAYS = 14;
+let span = RECENT_DAYS;   // 목록에 보여줄 기간(일). '이전 경기 더 보기'를 누르면 2주씩 늘어남
 const todayKST = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
 const watched = new Set(store.get('nospo.watched', []));
 
@@ -303,7 +306,8 @@ function render() {
   $('calBtn').classList.toggle('on', !!pickDate);
   $('calText').textContent = pickDate ? dayLabel(pickDate).code.slice(0, 5) : '날짜';
 
-  const pool = pickDate ? inSport.filter(m => m.date === pickDate) : inSport.filter(m => m.date >= daysAgo(RECENT_DAYS));
+  const pool = pickDate ? inSport.filter(m => m.date === pickDate) : inSport.filter(m => m.date >= daysAgo(span));
+  const older = pickDate ? 0 : inSport.filter(m => m.date < daysAgo(span) && (league === '전체' || m.league === league)).length;
   const leagues = ['전체', ...new Set(pool.map(m => m.league).filter(Boolean))];
   if (!leagues.includes(league)) league = '전체';
   $('leagues').innerHTML = leagues.length > 2 ? leagues.map(l => `<button class="chip" aria-pressed="${l === league}" data-league="${esc(l)}">${esc(l)}</button>`).join('') : '';
@@ -322,7 +326,7 @@ function render() {
   $('main').innerHTML = bar + hero + [...days].map(([d, ms]) => {
     const lab = dayLabel(d);
     return `<section><h2 class="sec-h"><b>${lab.name}</b><span>${lab.name.includes('월') ? lab.code.slice(6) : lab.code}</span></h2><div class="list">${ms.map(rowHtml).join('')}</div></section>`;
-  }).join('') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 1시간마다 업데이트 · 지난 경기는 날짜로 찾기</p>`;
+  }).join('') + (older ? `<button class="moreall" id="moreOld">이전 경기 더 보기 <span>${older}</span></button>` : '') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 1시간마다 업데이트</p>`;
 }
 const SEEN = m => m.videos.some(v => watched.has(v.id)) ? '<span class="seen">시청함</span>' : '';
 function extras(m, cls = 'sub') {
@@ -377,8 +381,9 @@ $('home').addEventListener('click', () => { sport = 'soccer'; league = '전체';
 
 document.addEventListener('click', e => {
   const tab = e.target.closest('.tab');
-  if (tab) { sport = tab.dataset.sport; league = '전체'; pickDate = null; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
+  if (tab) { sport = tab.dataset.sport; league = '전체'; pickDate = null; span = RECENT_DAYS; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
   if (e.target.id === 'clearDate') { pickDate = null; render(); return; }
+  if (e.target.closest('#moreOld')) { span += RECENT_DAYS; render(); return; }
   const chip = e.target.closest('.chip');
   if (chip) { league = chip.dataset.league; render(); return; }
   const p = e.target.closest('[data-play]');
