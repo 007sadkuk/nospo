@@ -155,6 +155,9 @@ const sources = readJson('sources.json', []);
 const old = readJson('data.json', {});
 const dateCache = old.v === VERSION ? old.dates || {} : {};
 const found = [];   // {id,title,date?,sport,league}
+// 한국 선수: 채널이 올리는 '○○○ 주요장면' 같은 영상 제목에 이름이 나오면 그 경기에 표시
+const KR = ['손흥민', '이강인', '김민재', '황희찬', '이재성', '황인범', '오현규', '설영우', '배준호', '양민혁', '정우영', '홍현석', '조규성', '김지수', '엄지성', '박승수', '윤도영', '카스트로프', '이한범', '정상빈', '이현주', '권혁규', '양현준', '김준홍', '백승호', '박용우', '이정후', '김혜성', '고석현', '유주상', '박준용', '최두호', '이정영', '정찬성', '김동현'];
+const krClips = [];   // {title, names, date}
 
 for (const src of sources) {
   const name = src.search ? `${src.handle} 검색 '${src.search}'` : src.playlist ? `재생목록 ${src.league}` : src.handle;
@@ -162,6 +165,8 @@ for (const src of sources) {
     const list = await collect(src);
     let n = 0;
     for (const it of list) {
+      const krs = KR.filter(n => it.title.includes(n));
+      if (krs.length) krClips.push({ title: it.title, names: krs, date: it.date || dateCache[it.id] || agoDate(it.ago)?.date || titleDate(it.title) });
       const league = accept(src, it.title);
       if (!league) continue;
       const t = parseTeams(it.title);
@@ -241,6 +246,21 @@ for (const m of matches) {
   const order = { main: 0, full: 1, vod: 2, game: 3 };
   m.videos.sort((a, b) => order[a.kind] - order[b.kind] || (a.n || 0) - (b.n || 0));
 }
+
+// 한국 선수 표시: 같은 두 팀 이름이 들어간 선수 영상이 있거나, 격투기처럼 선수 이름이 곧 팀 이름일 때
+const oldKr = new Map((old.matches || []).filter(m => m.kr).flatMap(m => (m.videos || []).map(v => [v.id, m.kr])));
+for (const m of matches) {
+  const [a, b = ''] = m.teams.split(' vs ');
+  const names = new Set(m.videos.flatMap(v => oldKr.get(v.id) || []));
+  KR.filter(n => a.includes(n) || b.includes(n)).forEach(n => names.add(n));
+  for (const c of krClips) {
+    if (!c.title.includes(a) || !c.title.includes(b)) continue;
+    if (c.date && Math.abs(Date.parse(c.date) - Date.parse(m.date)) > 3 * 864e5) continue;
+    c.names.forEach(n => names.add(n));
+  }
+  if (names.size) m.kr = [...names];
+}
+console.log(`한국 선수 표시: ${matches.filter(m => m.kr).length}경기`);
 
 const manual = readJson('manual.json', []);
 const all = [...manual, ...matches].sort((a, b) => b.date.localeCompare(a.date));
