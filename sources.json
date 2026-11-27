@@ -340,7 +340,8 @@
   "handle": "@tvNSPORTS",
   "must": [
    "[UFC"
-  ]
+  ],
+  "exclude": "KO|TKO|승리|패배|판정|서브미션|역전승|탭아웃"
  },
  {
   "sport": "basketball",
@@ -358,6 +359,43 @@
   "search": "tvN SPORTS [UFC]",
   "must": [
    "[UFC"
-  ]
+  ],
+  "exclude": "KO|TKO|승리|패배|판정|서브미션|역전승|탭아웃"
+ },
+ {
+  "sport": "ufc",
+  "league": "블랙컴뱃",
+  "handle": "@blackcombat",
+  "must": [
+   "[블랙컴뱃"
+  ],
+  "exclude": "Trailer|트레일러|계체|D-\\d|가이드|리뷰|KO|TKO|승리|패배|판정|서브미션|역전승|탭아웃"
+ },
+ {
+  "sport": "ufc",
+  "league": "블랙컴뱃",
+  "playlist": "PLH8tWVTt8sYQ",
+  "must": [
+   "[블랙컴뱃"
+  ],
+  "exclude": "Trailer|트레일러|계체|D-\\d|가이드|리뷰|KO|TKO|승리|패배|판정|서브미션|역전승|탭아웃"
+ },
+ {
+  "sport": "ufc",
+  "league": "블랙컴뱃",
+  "playlist": "PL2nmb04FHLkgq4UOrDuK5QRW18L24GgeO",
+  "must": [
+   "[블랙컴뱃"
+  ],
+  "exclude": "Trailer|트레일러|계체|D-\\d|가이드|리뷰|KO|TKO|승리|패배|판정|서브미션|역전승|탭아웃"
+ },
+ {
+  "sport": "ufc",
+  "league": "블랙컴뱃",
+  "playlist": "PL2nmb04FHLkhJUT_fEwwoZ851WBcxfow2",
+  "must": [
+   "[블랙컴뱃"
+  ],
+  "exclude": "Trailer|트레일러|계체|D-\\d|가이드|리뷰|KO|TKO|승리|패배|판정|서브미션|역전승|탭아웃"
  }
 ]
