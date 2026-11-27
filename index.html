@@ -44,12 +44,19 @@ button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; bord
 .tab .n { font-size: 12px; font-weight: 600; margin-left: 3px; color: var(--t3); }
 .tab[aria-selected="true"] { color: var(--text); }
 .tab[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: var(--text); }
-.tools { display: flex; align-items: flex-start; gap: 8px; padding: 12px 0; }
-.cal { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--s2); font-size: 13px; font-weight: 600; color: var(--t2); cursor: pointer; }
+.tools { display: flex; align-items: center; gap: 8px; padding: 12px 0 10px; }
+.search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 999px; background: var(--s2); color: var(--t3); }
+.search svg { width: 16px; height: 16px; flex-shrink: 0; }
+.search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--text); font: inherit; font-size: 16px; }
+.search input::placeholder { color: var(--t3); }
+.search:focus-within { box-shadow: 0 0 0 1.5px var(--t2); }
+.cal { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 999px; background: var(--s2); font-size: 13px; font-weight: 600; color: var(--t2); cursor: pointer; }
 .cal svg { width: 14px; height: 14px; }
 .cal input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; font-size: 16px; }
 .cal.on { background: var(--text); color: var(--bg); }
-.leagues { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; flex: 1; }   /* 리그가 많아도 잘리지 않게 줄바꿈 */
+.leagues { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 12px; }
+.leagues:empty { display: none; }
+.row .sp { color: var(--t2); }   /* 리그가 많아도 잘리지 않게 줄바꿈 */
 .leagues::-webkit-scrollbar { display: none; }
 .chip { flex-shrink: 0; height: 32px; padding: 0 13px; white-space: nowrap; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--t2); border: 1px solid var(--hair); }
 .chip[aria-pressed="true"] { background: var(--s3); color: var(--text); border-color: transparent; }
@@ -177,15 +184,16 @@ main { padding-block: 20px 64px; display: flex; flex-direction: column; gap: 36p
       <button class="tab" role="tab" data-sport="baseball">야구<span class="n"></span></button>
       <button class="tab" role="tab" data-sport="basketball">농구<span class="n"></span></button>
       <button class="tab" role="tab" data-sport="lck">LCK<span class="n"></span></button>
-      <button class="tab" role="tab" data-sport="ufc">UFC<span class="n"></span></button>
+      <button class="tab" role="tab" data-sport="ufc">격투기<span class="n"></span></button>
     </nav>
   </div>
 </header>
 <div class="wrap">
   <div class="tools">
     <label class="cal" id="calBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span id="calText">날짜</span><input type="date" id="calInput" aria-label="날짜로 경기 찾기"></label>
-    <div class="leagues" id="leagues"></div>
+    <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="q" placeholder="팀·선수 검색" autocomplete="off" enterkeyhint="search" aria-label="경기 검색"></label>
   </div>
+  <div class="leagues" id="leagues"></div>
 </div>
 
 <main class="wrap" id="main">
@@ -221,7 +229,7 @@ const SPORTS = {
   baseball: { name: '야구', empty: 'KBO는 지금 비시즌이에요. 3월에 개막하면 자동으로 채워져요. 지난 경기는 달력으로 찾아보세요.' },
   basketball: { name: '농구', empty: '최근 2주 동안 올라온 농구 하이라이트가 없어요.' },
   lck: { name: 'LCK', empty: '최근 2주 동안 올라온 LCK 하이라이트가 없어요. 지난 경기는 달력으로 찾아보세요.' },
-  ufc: { name: 'UFC', empty: '최근 2주 동안 올라온 UFC 경기 영상이 없어요. 지난 경기는 달력으로 찾아보세요.' },
+  ufc: { name: '격투기', empty: '최근 2주 동안 올라온 UFC 경기 영상이 없어요. 지난 경기는 달력으로 찾아보세요.' },
 };
 const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>';
 const $ = id => document.getElementById(id);
@@ -235,6 +243,7 @@ let data = [];
 let sport = store.get('nospo.sport', 'soccer');
 if (!SPORTS[sport]) sport = 'soccer';
 let league = '전체';
+let query = '';   // 검색어
 let pickDate = null;   // 달력에서 고른 날짜 (없으면 최근 2주)
 const RECENT_DAYS = 14;
 let span = RECENT_DAYS;   // 목록에 보여줄 기간(일). '이전 경기 더 보기'를 누르면 2주씩 늘어남
@@ -270,7 +279,7 @@ async function load() {
 
 // ── 목록 화면 ──
 const LOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
-const EN = { '프리미어리그': 'Premier League', '라리가': 'LaLiga', '분데스리가': 'Bundesliga', '세리에A': 'Serie A', '챔피언스리그': 'Champions League', '유로파리그': 'Europa League', '컨퍼런스리그': 'Conference League', '네이션스리그': 'Nations League', '스코틀랜드 리그': 'Scottish Premiership', 'K리그1': 'K League 1', 'K리그2': 'K League 2', 'MLS': 'MLS', 'KBO': 'KBO League', 'KBO 포스트시즌': 'KBO Postseason', 'KBO 한국시리즈': 'Korean Series', '리그1': 'Ligue 1', 'FA컵': 'FA Cup', '카라바오컵': 'Carabao Cup', 'EFL 챔피언십': 'EFL Championship', 'UEFA 유스리그': 'UEFA Youth League', 'KBL': 'KBL', 'WKBL': 'WKBL', 'NBA': 'NBA', 'LCK': 'LCK', '월드 챔피언십': 'Worlds', 'UFC': 'UFC' };
+const EN = { '프리미어리그': 'Premier League', '라리가': 'LaLiga', '분데스리가': 'Bundesliga', '세리에A': 'Serie A', '챔피언스리그': 'Champions League', '유로파리그': 'Europa League', '컨퍼런스리그': 'Conference League', '네이션스리그': 'Nations League', '스코틀랜드 리그': 'Scottish Premiership', 'K리그1': 'K League 1', 'K리그2': 'K League 2', 'MLS': 'MLS', 'KBO': 'KBO League', 'KBO 포스트시즌': 'KBO Postseason', 'KBO 한국시리즈': 'Korean Series', '리그1': 'Ligue 1', 'FA컵': 'FA Cup', '카라바오컵': 'Carabao Cup', 'EFL 챔피언십': 'EFL Championship', 'UEFA 유스리그': 'UEFA Youth League', 'KBL': 'KBL', 'WKBL': 'WKBL', 'NBA': 'NBA', 'LCK': 'LCK', '월드 챔피언십': 'Worlds', 'UFC': 'UFC', '블랙컴뱃': 'Black Combat' };
 const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 function dayLabel(d) {
   const utc = s => { const [y, m, dd] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, dd)); };
@@ -314,6 +323,8 @@ function render() {
     t.setAttribute('aria-selected', t.dataset.sport === sport);
     t.querySelector('.n').textContent = data.filter(m => m.sport === t.dataset.sport && m.date >= daysAgo(RECENT_DAYS)).length || '';
   });
+  const q = query.trim().toLowerCase().replace(/\s+/g, '');
+  if (q) return renderSearch(q);
   const inSport = data.filter(m => m.sport === sport);
   const dates = inSport.map(m => m.date).sort();
   $('calInput').min = dates[0] || ''; $('calInput').max = todayKST();
@@ -364,7 +375,7 @@ function heroHtml(m) {
         <div class="meta"><span class="new">NEW</span>${esc(m.league)} · ${dayLabel(m.date).name} ${SEEN(m)}</div>
         <div class="matchup">
           <div class="side">${badge(a, 'xl')}<span class="nm">${esc(a)}</span></div>
-          <div class="vsbox"><span class="q">?:?</span><small>${LOCK_SM}결과 숨김</small></div>
+          <div class="vsbox"><span class="q">VS</span></div>
           <div class="side">${badge(b, 'xl')}<span class="nm">${esc(b)}</span></div>
         </div>
       </div>
@@ -375,17 +386,31 @@ function heroHtml(m) {
     </div>
   </article></section>`;
 }
-function rowHtml(m) {
+// 검색: 모든 종목·모든 날짜에서 팀/선수 이름과 리그로 찾기
+function renderSearch(q) {
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', 'false'));
+  $('leagues').innerHTML = '';
+  const hit = data.filter(m => (m.teams + m.league + teamOf(m.teams.split(' vs ')[0]).code + teamOf(m.teams.split(' vs ')[1] || '').code).toLowerCase().replace(/\s+/g, '').includes(q))
+    .sort((a, b) => b.date.localeCompare(a.date));
+  if (!hit.length) { $('main').innerHTML = `<div class="state"><b>'${esc(query)}' 경기가 없어요</b>팀 이름을 짧게 쳐 보세요. 예: 리버풀, T1, 추성훈</div>`; return; }
+  const days = new Map();
+  hit.forEach(m => days.set(m.date, [...(days.get(m.date) || []), m]));
+  $('main').innerHTML = `<div class="datebar">'${esc(query)}' 검색 결과 ${hit.length}경기<button id="clearQ">검색 지우기</button></div>` + [...days].map(([d, ms]) => {
+    const lab = dayLabel(d);
+    return `<section><h2 class="sec-h"><b>${lab.name}</b><span>${lab.code}</span></h2><div class="list">${ms.map(m => rowHtml(m, true)).join('')}</div></section>`;
+  }).join('');
+}
+function rowHtml(m, withSport) {
   const [a, b = ''] = m.teams.split(' vs ');
   const series = m.sport === 'lck' && m.videos.some(v => v.kind === 'game') ? ' · 시리즈' : '';
   return `<article class="row ${m.sport}" ${playAttr(m)} role="button" tabindex="0" aria-label="${esc(m.teams)} 하이라이트 재생">
     <div class="teams">
-      <div class="lg">${esc(m.league)}${series} ${SEEN(m)}</div>
+      <div class="lg">${withSport ? `<span class="sp">${SPORTS[m.sport].name}</span> · ` : ''}${esc(m.league)}${series} ${SEEN(m)}</div>
       <div class="tm">${badge(a)}<span>${esc(a)}</span></div>
       <div class="tm">${badge(b)}<span>${esc(b)}</span></div>
       ${extras(m, 'mini') ? `<div class="more">${extras(m, 'mini')}</div>` : ''}
     </div>
-    <div class="right"><span class="lock">?:?</span><span class="go">${PLAY_ICON}</span></div>
+    <div class="right"><span class="go">${PLAY_ICON}</span></div>
   </article>`;
 }
 
@@ -396,12 +421,15 @@ $('calBtn').addEventListener('click', e => {
   if (typeof inp.showPicker === 'function') { e.preventDefault(); try { inp.showPicker(); return; } catch {} }
   inp.focus(); inp.click();
 });
-$('home').addEventListener('click', () => { sport = 'soccer'; league = '전체'; pickDate = null; store.set('nospo.sport', sport); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+$('q').addEventListener('input', e => { query = e.target.value; render(); });
+$('q').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+$('home').addEventListener('click', () => { query = ''; $('q').value = ''; sport = 'soccer'; league = '전체'; pickDate = null; store.set('nospo.sport', sport); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
 document.addEventListener('click', e => {
   const tab = e.target.closest('.tab');
-  if (tab) { sport = tab.dataset.sport; league = '전체'; pickDate = null; span = RECENT_DAYS; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
+  if (tab) { sport = tab.dataset.sport; league = '전체'; pickDate = null; query = ''; $('q').value = ''; span = RECENT_DAYS; store.set('nospo.sport', sport); render(); window.scrollTo(0, 0); return; }
   if (e.target.id === 'clearDate') { pickDate = null; render(); return; }
+  if (e.target.id === 'clearQ') { query = ''; $('q').value = ''; render(); return; }
   if (e.target.closest('#moreOld')) { span += RECENT_DAYS; render(); return; }
   if (e.target.id === 'rangeCal') { const inp = $('calInput'); try { inp.showPicker(); } catch { inp.focus(); inp.click(); } return; }
   const chip = e.target.closest('.chip');
