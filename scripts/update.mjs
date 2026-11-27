@@ -49,6 +49,7 @@ async function rss(query) {
     id: (e.match(/<yt:videoId>([^<]+)/) || [])[1],
     title: decode((e.match(/<title>([^<]*)/) || [])[1] || ''),
     date: kstDate((e.match(/<published>([^<]+)/) || [])[1]),
+    at: (e.match(/<published>([^<]+)/) || [])[1],
   })).filter(x => x.id);
 }
 async function channelId(handle) {
@@ -216,9 +217,11 @@ for (const f of found.sort((x, y) => (dateCache[y.id] || '').localeCompare(dateC
   let m = matches.find(x => x.sport === f.sport && x.teams === teams && Math.abs(Date.parse(x.date) - day) <= win);
   if (!m) {
     m = { id: f.id, sport: f.sport, league: f.league, teams, date, videos: [] };
+    if (f.at) m.time = new Date(f.at).toLocaleTimeString('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit' });   // 영상 올라온 시각 (한국 시간)
     matches.push(m);
   }
   if (date < m.date) m.date = date;
+  if (!m.time && f.at) m.time = new Date(f.at).toLocaleTimeString('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit' });
   if (m.videos.some(v => v.kind === f.kind && v.n === f.n)) continue;
   m.videos.push({ id: f.id, kind: f.kind, label: f.label, ...(f.n ? { n: f.n } : {}) });
 }
@@ -232,6 +235,8 @@ if (old.v === VERSION) {
     (m.videos || []).forEach(v => seen.add(v.id));
   }
 }
+const oldTime = new Map((old.matches || []).flatMap(m => (m.videos || []).map(v => [v.id, m.time])).filter(x => x[1]));
+for (const m of matches) if (!m.time) { const t = m.videos.map(v => oldTime.get(v.id)).find(Boolean); if (t) m.time = t; }
 for (const m of matches) {
   const order = { main: 0, full: 1, vod: 2, game: 3 };
   m.videos.sort((a, b) => order[a.kind] - order[b.kind] || (a.n || 0) - (b.n || 0));
