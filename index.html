@@ -258,6 +258,9 @@ const watched = new Set(store.get('nospo.watched', []));
 
 // ── 데이터 ──
 function normalize(m) {
+  // 일부 채널 제목은 한글 자모가 풀어진 형태라 검색이 안 됨 → 표준 형태로 맞춤
+  m.teams = String(m.teams || '').normalize('NFC');
+  m.league = String(m.league || '').normalize('NFC');
   if (!m.videos) {   // 예전 형식(highlight 필드)도 읽기
     const id = u => (String(u || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/) || [])[1];
     m.videos = [];
@@ -329,7 +332,7 @@ function render() {
     t.setAttribute('aria-selected', t.dataset.sport === sport);
     t.querySelector('.n').textContent = data.filter(m => m.sport === t.dataset.sport && m.date >= daysAgo(RECENT_DAYS)).length || '';
   });
-  const q = query.trim().toLowerCase().replace(/\s+/g, '');
+  const q = query.normalize('NFC').trim().toLowerCase().replace(/\s+/g, '');
   if (q) return renderSearch(q);
   const inSport = data.filter(m => m.sport === sport);
   const dates = inSport.map(m => m.date).sort();
