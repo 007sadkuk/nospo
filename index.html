@@ -354,7 +354,7 @@ function render() {
   $('main').innerHTML = range + bar + hero + [...days].map(([d, ms]) => {
     const lab = dayLabel(d);
     return `<section><h2 class="sec-h"><b>${lab.name}</b><span>${lab.name.includes('월') ? lab.code.slice(6) : lab.code}</span></h2><div class="list">${ms.map(rowHtml).join('')}</div></section>`;
-  }).join('') + (older ? `<button class="moreall" id="moreOld">이전 경기 더 보기 <span>${older}</span></button>` : '') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 1시간마다 업데이트</p>`;
+  }).join('') + (older ? `<button class="moreall" id="moreOld">이전 경기 더 보기 <span>${older}</span></button>` : '') + `<p class="foot">공식 유튜브 채널 영상만 모아요 · 15분마다 업데이트</p>`;
 }
 const SEEN = m => m.videos.some(v => watched.has(v.id)) ? '<span class="seen">시청함</span>' : '';
 function extras(m, cls = 'sub') {
@@ -372,7 +372,7 @@ function heroHtml(m) {
   return `<section><h2 class="sec-h"><b>방금 올라온 경기</b></h2><article class="hero" style="--ta:${A.color};--tb:${B.color}">
     <div class="hero-in">
       <div class="left">
-        <div class="meta"><span class="new">NEW</span>${esc(m.league)} · ${dayLabel(m.date).name} ${SEEN(m)}</div>
+        <div class="meta"><span class="new">NEW</span>${esc(m.league)} · ${dayLabel(m.date).name}${m.time ? ' ' + m.time : ''} ${SEEN(m)}</div>
         <div class="matchup">
           <div class="side">${badge(a, 'xl')}<span class="nm">${esc(a)}</span></div>
           <div class="vsbox"><span class="q">VS</span></div>
@@ -387,6 +387,8 @@ function heroHtml(m) {
   </article></section>`;
 }
 // 검색: 모든 종목·모든 날짜에서 팀/선수 이름과 리그로 찾기
+// 영상이 올라온 시각 (경기 시작 시각이 아니라 하이라이트가 올라온 시각)
+const TIME = m => m.time ? ` · <span title="하이라이트가 올라온 시각">${m.time} 업로드</span>` : '';
 function renderSearch(q) {
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', 'false'));
   $('leagues').innerHTML = '';
@@ -405,7 +407,7 @@ function rowHtml(m, withSport) {
   const series = m.sport === 'lck' && m.videos.some(v => v.kind === 'game') ? ' · 시리즈' : '';
   return `<article class="row ${m.sport}" ${playAttr(m)} role="button" tabindex="0" aria-label="${esc(m.teams)} 하이라이트 재생">
     <div class="teams">
-      <div class="lg">${withSport ? `<span class="sp">${SPORTS[m.sport].name}</span> · ` : ''}${esc(m.league)}${series} ${SEEN(m)}</div>
+      <div class="lg">${withSport ? `<span class="sp">${SPORTS[m.sport].name}</span> · ` : ''}${esc(m.league)}${series}${TIME(m)} ${SEEN(m)}</div>
       <div class="tm">${badge(a)}<span>${esc(a)}</span></div>
       <div class="tm">${badge(b)}<span>${esc(b)}</span></div>
       ${extras(m, 'mini') ? `<div class="more">${extras(m, 'mini')}</div>` : ''}
